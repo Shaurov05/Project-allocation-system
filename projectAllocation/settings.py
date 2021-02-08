@@ -15,6 +15,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import os
+MAIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(MAIN_DIR,"templates")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -37,6 +40,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # apps
+    'student',
+    'teacher',
+    'project',
+
+    # rest framework
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
+    # 'rest_auth',
+
+    # forms
+    'crispy_forms',
+
+    # vue js
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +73,7 @@ ROOT_URLCONF = 'projectAllocation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,6 +99,32 @@ DATABASES = {
     }
 }
 
+
+## email sending app
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'expressyourthought05@gmail.com'
+EMAIL_HOST_PASSWORD = 'thisisbusinessemail'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+
+# mySQL database
+
+# DATABASES = {
+# 	'default': {
+# 		'ENGINE': 'django.db.backends.mysql',
+# 		'NAME': 'project_allocation',
+# 		'USER': 'root',
+# 		'PASSWORD': "",
+# 		'HOST':"",
+# 		'PORT': "",
+# 		'OPTIONS': {
+# 			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+# 		}
+# 	}
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -117,4 +162,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(MAIN_DIR, 'media')
+
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(MAIN_DIR, 'static')
+
+LOGIN_URL = '/user/login/'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'thanks/'
+
