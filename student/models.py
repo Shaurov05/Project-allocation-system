@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
@@ -18,6 +17,10 @@ class Student(models.Model):
     student_slug = models.SlugField(allow_unicode=True, unique=True)
     session = models.CharField(max_length=9, blank=False)
 
+    created_by = models.ForeignKey(User, blank=False, related_name="student_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, blank=False, related_name="student_updated_by", on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.user.username
@@ -26,10 +29,10 @@ class Student(models.Model):
         self.student_slug = slugify(self.user.username)
         super().save(*args, **kwargs)
 
-    # def get_absolute_url(self):
-    #     return reverse("students:student_detail",
-    #                     kwargs={'department_slug':self.department.department_slug ,"student_slug":self.student_slug})
+    def get_absolute_url(self):
+        return reverse("students:student_detail",
+                        kwargs={'department_slug':self.department.department_slug, "student_slug":self.student_slug})
 
     class Meta:
         ordering = ["student_ID"]
-        unique_together = ["user", ]
+        unique_together = ["user", "department"]

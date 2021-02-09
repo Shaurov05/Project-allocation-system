@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
@@ -17,6 +16,10 @@ class Department(models.Model):
     acronyms = models.CharField(max_length=10)
     established_date = models.DateTimeField(blank=False)
 
+    created_by = models.ForeignKey(User, blank=False, related_name="department_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, blank=False, related_name="department_updated_by", on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
     # immages = models.ManyToManyField(DepartmentImages,through=...)
 
     def __str__(self):
@@ -31,10 +34,9 @@ class Department(models.Model):
         self.acronyms = "".join(ch[0] for ch in self.acronyms.split())
         super().save(*args, **kwargs)
 
-    # def get_absolute_url(self):
-    #     return reverse("departments:department_detail",
-    #                     kwargs={"faculty_slug":self.faculty.faculty_slug ,
-    #                             "department_slug":self.department_slug})
+    def get_absolute_url(self):
+        return reverse("departments:department_detail",
+                        kwargs={"department_slug" : self.department_slug})
 
     class Meta:
         ordering = ["name"]
