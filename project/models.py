@@ -13,7 +13,7 @@ from django.utils.text import slugify
 class Project(models.Model):
     student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='student_project')
     department = models.ForeignKey(Department,blank=False, related_name="department_projects", on_delete=models.CASCADE)
-    student_ID = models.CharField(max_length=20, unique=True, blank=False)
+    student_ID_no = models.CharField(max_length=20, unique=True, blank=False)
 
     name = models.CharField(max_length=300, blank=False)
     project_slug = models.SlugField(allow_unicode=True, unique=True)

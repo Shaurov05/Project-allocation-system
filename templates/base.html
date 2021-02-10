@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>PAS</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Optional theme -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+
+    <!-- Alternative to Bootstrap 3 Glyphicons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+
+  <!-- Favicons -->
+  <link href='{% static "assets/img/logo_small.jpg" %}' rel="icon">
+  <!-- <link href='{% static "assets/img/apple-touch-icon.png" %}' rel="apple-touch-icon"> -->
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+
+  <!-- Template Main CSS File -->
+  <link href='{% static "assets/css/style.css" %}' rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">WebSiteName</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="nav-item active">
+        <a href='{% url "index" %}'>Home</a>
+      </li>
+
+      <li class="nav-item">
+        <a href="/#about">About</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="/#departments" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Department
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Department</a>
+          <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Departments</a>
+        </div>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Student & Teachers
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'students:all_students' %}">Students</a>
+          <a class="dropdown-item" href="{% url 'teachers:all_teachers' %}">Teachers</a>
+
+          {% if user.is_authenticated %}
+            <a class="dropdown-item" href="{% url 'students:student_register' %}">Register as Student</a>
+            <a class="dropdown-item" href="{% url 'teachers:teacher_register' %}">Register as Teacher</a>
+          {% endif %}
+        </div>
+      </li>
+
+      {% if user.is_authenticated  %}
+
+        {% if user.is_superuser %}
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Status: Superuser
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+            <a class="dropdown-item" href="/admin/">Admin</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+          </div>
+      </li>
+
+        {% elif user.teacher.ID_Number %}
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Status: Teacher
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+            <a class="dropdown-item" href="{% url 'teachers:teacher_detail' department_slug=user.teacher.department.department_slug teacher_slug=user.teacher.teacher_slug %}">Profile</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+          </div>
+      </li>
+
+        {% elif user.student.ID_Number %}
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Status: Student
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{% url 'students:student_detail' department_slug=user.student.department.department_slug student_slug=user.student.student_slug %}">Profile</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+          </div>
+      </li>
+        {% endif %}
+
+        {% else %}
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Login & Register
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{% url 'user_login' %}">Login</a>
+          </div>
+
+<!--        <li class="nav-item dropdown">-->
+          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Register
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{% url 'students:student_register' %}">As a Student</a>
+            <a class="dropdown-item" href="{% url 'teachers:teacher_register' %}">As a Teacher</a>
+          </div>
+<!--        </li>-->
+
+
+      </li>
+
+        {% endif %}
+
+    </ul>
+  </div>
+</nav>
+
+  {% block body_block %}
+
+  {% endblock %}
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-5 col-md-5">
+            <div class="footer-info">
+              <h3>PAS</h3>
+              <p>
+                A108 Adam Street <br>
+                NY 535022, USA<br><br>
+                <strong>Phone:</strong> +1 5589 55488 55<br>
+                <strong>Email:</strong> info@example.com<br>
+              </p>
+
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="/#departments">Department</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="/#about">About us</a></li>
+              <!-- <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li> -->
+            </ul>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+
+  </footer><!-- End Footer -->
+
+
+</body>
+
+</html>

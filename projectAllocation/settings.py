@@ -54,9 +54,11 @@ INSTALLED_APPS = [
 
     # forms
     'crispy_forms',
+    'bootstrap4',
+    'extra_views',
 
     # vue js
-    'webpack_loader',
+    # 'webpack_loader',
 ]
 
 MIDDLEWARE = [

@@ -13,7 +13,7 @@ class Student(models.Model):
 
     department = models.ForeignKey(Department,blank=False, related_name="students", on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='students/profile_pics', blank=True)
-    student_ID = models.CharField(max_length=20, unique=True, blank=False)
+    ID_Number = models.CharField(max_length=20, unique=True, blank=False)
     student_slug = models.SlugField(allow_unicode=True, unique=True)
     session = models.CharField(max_length=9, blank=False)
 
@@ -34,5 +34,5 @@ class Student(models.Model):
                         kwargs={'department_slug':self.department.department_slug, "student_slug":self.student_slug})
 
     class Meta:
-        ordering = ["student_ID"]
+        ordering = ["ID_Number"]
         unique_together = ["user", "department"]
