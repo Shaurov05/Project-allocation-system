@@ -14,13 +14,12 @@ class Department(models.Model):
     detail_html = models.TextField(editable=False)
     department_slug = models.SlugField(allow_unicode=True, unique=True)
     acronyms = models.CharField(max_length=10)
-    established_date = models.DateTimeField(blank=False)
+    established_date = models.DateTimeField(blank=True, null=True)
 
-    created_by = models.ForeignKey(User, blank=False, related_name="department_created_by", on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, blank=False, related_name="department_updated_by", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name="department_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, null=True, blank=True, related_name="department_updated_by", on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    # immages = models.ManyToManyField(DepartmentImages,through=...)
 
     def __str__(self):
         return self.name.upper()

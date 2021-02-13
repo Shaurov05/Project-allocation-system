@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body_block %}
+<br>
+    <div class="container">
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong> {{ message }} </strong>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+<div class="container card border border-dark" style="background-color:#f2f2f2; width: 65rem;">
+  <div card-body>
+      <br>
+    {% block content %}
+
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock %}

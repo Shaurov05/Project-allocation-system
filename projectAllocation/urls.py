@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 
     path('admin/', admin.site.urls),
-    path('', views.AllFacultyList.as_view() , name='index'),
+    path('', views.IndexPage.as_view() , name='index'),
 
     path('registration/options/', views.RegistrationOptionsPage.as_view(), name='registration_options'),
     path('logout/', views.user_logout, name='logout'),

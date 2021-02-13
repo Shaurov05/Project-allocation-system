@@ -15,6 +15,7 @@ from django.views.generic import (TemplateView,ListView,View,
                                   UpdateView,DeleteView)
 
 from django.urls import reverse_lazy
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from braces.views import SelectRelatedMixin
 
@@ -38,16 +39,16 @@ class LogoutPage(TemplateView):
 
 
 from department.models import Department
-class AllFacultyList(TemplateView):
+class IndexPage(TemplateView):
 
     template_name = 'index.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        departments = Department.objects.all()
-
-        context["departments"] = departments[:5]
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     departments = Department.objects.all()
+    #
+    #     context["departments"] = departments[:5]
+    #     return context
 
 
 
@@ -81,6 +82,8 @@ def user_login(request):
                     )
             print('Someone tried to login and failed. user: {} pass: {}'.format(user.username, user.password))
             print('He used username: {} and password : {}'.format(username,password))
-            return HttpResponse("Invalid login details supplied!")
+            # return HttpResponse("Invalid login details supplied!")
+            messages.success(request, "Invalid login details supplied!")
+            return render(request, 'user_login.html')
     else:
         return render(request, 'user_login.html')

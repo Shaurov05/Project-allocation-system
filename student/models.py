@@ -17,8 +17,8 @@ class Student(models.Model):
     student_slug = models.SlugField(allow_unicode=True, unique=True)
     session = models.CharField(max_length=9, blank=False)
 
-    created_by = models.ForeignKey(User, blank=False, related_name="student_created_by", on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, blank=False, related_name="student_updated_by", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name="student_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, null=True, blank=True, related_name="student_updated_by", on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 

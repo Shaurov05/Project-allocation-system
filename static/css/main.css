@@ -1,0 +1,43 @@
+body {
+  font-family: Merriweather, Georgia, "times new roman", serif;
+  color: #222;
+  background-color:black;
+}
+
+font{
+    font-style: normal;
+    font-variant-ligatures: normal;
+    font-variant-caps: normal;
+    font-variant-numeric: normal;
+    font-variant-east-asian: normal;
+    font-weight: 400;
+    font-stretch: normal;
+    font-size: 18px;
+    line-height: 1.8;
+    font-family: Merriweather, Georgia, "times new roman", serif;
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: justify;
+    margin-top: 0px;
+    margin-bottom: 1rem;
+}
+
+
+a {
+  color: #1bac91;
+}
+
+a:hover {
+  color: #22d8b6;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Merriweather, Georgia, "times new roman", serif;
+}

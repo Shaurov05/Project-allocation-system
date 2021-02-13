@@ -53,7 +53,8 @@ def student_register(request):
             student_profile = student_profile_form.save(commit=False)
             # Set One to One relationship between
             # StudentForm and StudentProfileInfoForm
-            student_profile.user = user
+            if request.user:
+                student_profile.user = user
 
             if 'profile_pic' in request.FILES:
                 student_profile.profile_pic = request.FILES['profile_pic']
@@ -79,7 +80,7 @@ def student_register(request):
         student_form = StudentForm()
         student_profile_form = StudentProfileInfoForm()
 
-    return render(request, "students/student_registration.html",context={
+    return render(request, "student/student_registration.html",context={
                     'student_form':student_form,
                     'student_profile_form':student_profile_form,
                     'registered':registered})
@@ -104,7 +105,7 @@ def student_login(request):
             print('Invalid Username: {} and password: {} is provided'.format(username, password))
             return HttpResponse("Invalid username or password supplied!")
     else:
-        return render(request, 'students/login.html',{})
+        return render(request, 'student/login.html',{})
 
 
 @login_required
@@ -122,7 +123,7 @@ def change_password(request):
             messages.error(request, "Please provide valid information")
     else:
         form = PasswordChangeForm()
-    return render(request, 'students/change_password.html',{
+    return render(request, 'student/change_password.html',{
                             'form':form})
 
 
@@ -130,7 +131,7 @@ class StudentDetailView(SelectRelatedMixin, DetailView):
     select_related = ("user", "department")
     context_object_name = 'student_detail'
     model = Student
-    template_name = 'students/student_detail.html'
+    template_name = 'student/student_detail.html'
 
     def get_object(self, **kwargs):
         return get_object_or_404(
@@ -149,53 +150,71 @@ class StudentList(SelectRelatedMixin, ListView):
     #     # context['current_month'] = self.current_month
     #     return context
 
-
-from django.forms import ModelForm
-@login_required
-def StudentUpdate(request, student_slug):
-    object = Student.objects.get(student_slug=student_slug)
-    form = ModelForm(instance=object)
-
-    return render(request, 'students/profileupdate_form.html', {'form':form})
-
-
-from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
-
-class StudentUpdateView(InlineFormSetFactory):
-    model = Student
-    fields = ['profile_pic','department', 'session']
-
-class AccountEditView(UpdateWithInlinesView):
-    model = User
-    old_password = []
-    old_password.clear()
-    fields = ['username', 'email', 'password']
-    inlines = [StudentUpdateView,]
-    template_name = 'students/profileupdate_form.html'
-
-    def get_object(self):
-        user = User.objects.get(pk=self.request.user.pk)
-        self.old_password.append(user.password)
-        return user
-
-    def get_success_url(self):
-        user1 = self.get_object()
-        if self.old_password[1] == self.old_password[2]:
-            print("no change passsword ",user1.password)
+def getForms(request, student_slug):
+    if request.method == 'POST':
+        if not request.user.is_superuser:
+            user_form = StudentForm(request.POST, instance=request.user)
+            student_profile_form = StudentProfileInfoForm(request.POST, instance=request.user.student)
+            department_slug = request.user.student.department.department_slug
+            return user_form, student_profile_form, department_slug
         else:
-            user1.set_password(user1.password)
+            print("admin")
+            student = Student.objects.get(student_slug=student_slug)
+            user_form = StudentForm(request.POST, instance=student.user)
+            student_profile_form = StudentProfileInfoForm(request.POST, instance=student)
+            department_slug = student.department.department_slug
+            return user_form, student_profile_form, department_slug
+    else:
+        if not request.user.is_superuser:
+            user_form = StudentForm( instance=request.user)
+            student_profile_form = StudentProfileInfoForm(instance=request.user.student)
+            return user_form, student_profile_form
+        else:
+            print("admin")
+            student = Student.objects.get(student_slug=student_slug)
+            user_form = StudentForm( instance=student.user)
+            student_profile_form = StudentProfileInfoForm( instance=student)
+            return user_form, student_profile_form
 
-        user1.save()
-        user1.student.save()
 
-        self.old_password.clear()
+from django.db import transaction
+@login_required
+@transaction.atomic
+def update_student_profile(request, student_slug):
 
-        return get_object_or_404(
-                    Student,
-                    pk=user1.student.id
-                ).get_absolute_url()
+    if request.method == 'POST':
+        user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
 
+        if user_form.is_valid() and student_profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
 
+            user.save()
+            student_profile_form.save()
+
+            messages.success(request, ('Your profile is successfully updated!'))
+            return redirect(reverse('students:student_detail', kwargs={
+                                    'student_slug': student_slug,
+                                    'department_slug': department_slug}))
+        else:
+            messages.error(request, ('Please check the error below.'))
+            user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
+
+            user_form_errors = user_form.errors
+            student_profile_form_errors = student_profile_form.errors
+            return render(request, 'student/profileupdate_form.html', {
+                'user_form': user_form,
+                'profile_form': student_profile_form,
+                'user_form_errors':user_form_errors,
+                'student_profile_form_errors':student_profile_form_errors
+            })
+    else:
+        user_form, student_profile_form = getForms(request, student_slug=student_slug)
+
+    return render(request, 'student/profileupdate_form.html', {
+        'user_form': user_form,
+        'profile_form': student_profile_form,
+    })
 
 
 class StudentDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
@@ -223,4 +242,4 @@ class StudentDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
 class all_students(ListView):
     model = Student
     context_object_name = 'students'
-    template_name = 'students/all_students.html'
+    template_name = 'student/all_students.html'

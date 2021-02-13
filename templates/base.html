@@ -32,126 +32,211 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
   <link href='{% static "assets/css/style.css" %}' rel="stylesheet">
+<!--  <link href='{% static "css/main.css" %}' rel="stylesheet">-->
 
 </head>
 
+<style>
+  .navbar .nav-item .dropdown-menu{ display: none; }
+	.navbar .nav-item:hover .nav-link{ color: #fff;  }
+	.navbar .nav-item:hover .dropdown-menu{ display: block; }
+	.navbar .nav-item .dropdown-menu{ margin-top:0; }
+
+
+  body {
+      font-family: Merriweather, Georgia, "times new roman", serif;
+      color: #222;
+    }
+
+
+    font{
+        font-style: normal;
+        font-variant-ligatures: normal;
+        font-variant-caps: normal;
+        font-variant-numeric: normal;
+        font-variant-east-asian: normal;
+        font-weight: 400;
+        font-stretch: normal;
+        font-size: 18px;
+        line-height: 1.8;
+        font-family: Merriweather, Georgia, "times new roman", serif;
+    }
+
+    p {
+        display: block;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        text-align: justify;
+        margin-top: 0px;
+        margin-bottom: 1rem;
+    }
+
+
+    a {
+      color: #1bac91;
+    }
+
+    a:hover {
+      color: #22d8b6;
+      text-decoration: none;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: Merriweather, Georgia, "times new roman", serif;
+    }
+  }
+</style>
+
 <body>
-
   <!-- ======= Header ======= -->
-
-
-<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark ">
   <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">WebSiteName</a>
+    <div class="row">
+      <div class="col-md-2">
+        <div class="navbar-header" >
+          <a style="font-size:25px;" class="navbar-brand" href='{% url "index" %}'>Project Allocation System</a>
+        </div>
+
+      </div>
+
+
+      <div class="col-md-2">  </div>
+
+      <div class="col-md-7" style="float:right;">
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class=" navbar-nav dropdown" >
+            <li class="nav-item active ">
+              <a class="nav-link" href='{% url "index" %}'>Home</a>
+            </li>
+
+
+            <li class="nav-item">
+              <a class="nav-link" href="/#about">About</a>
+            </li>
+
+            <li class="nav-item dropdown dropdown2">
+              <a class="nav-link dropdown-toggle " href="/#departments" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Department
+              </a>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Department</a>
+                <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Departments</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown dropdown2">
+              <a class="nav-link dropdown-toggle " href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Student & Teachers
+              </a>
+              <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'students:all_students' %}">Students</a>
+                <a class="dropdown-item" href="{% url 'teachers:all_teachers' %}">Teachers</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown dropdown2">
+                <a class="nav-link dropdown-toggle " href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Register
+                </a>
+                <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+
+                    <a class="dropdown-item" href="{% url 'students:student_register' %}"> New Student</a>
+                    <a class="dropdown-item" href="{% url 'teachers:teacher_register' %}"> New Teacher</a>
+
+                </div>
+              </li>
+
+            {% if user.is_authenticated  %}
+
+              {% if user.is_superuser %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Status: Superuser
+                </a>
+                <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+
+                  <a class="dropdown-item" href="/admin/">Admin</a>
+                  <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+
+              {% elif user.teacher.ID_Number %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Status: Teacher
+                </a>
+                <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+
+                  <a class="dropdown-item" href="{% url 'teachers:teacher_detail' department_slug=user.teacher.department.department_slug teacher_slug=user.teacher.teacher_slug %}">Profile</a>
+                  <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+
+              {% elif user.student.ID_Number %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Status: Student
+                </a>
+                <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="{% url 'students:student_detail' department_slug=user.student.department.department_slug student_slug=user.student.student_slug %}">Profile</a>
+                  <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+              {% endif %}
+
+              {% else %}
+
+            <li class="nav-item nav-link">
+
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'user_login' %}">Login</a>
+            </li>
+
+            <li class="nav-item nav-link">
+
+            </li>
+
+              {% endif %}
+
+
+
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="col-md-1" style="width:80px;
+                                    height:80px;
+                                    top:10px;
+                                    right:10px;
+                                    z-index: 3;
+                                    position:absolute;">
+              <!-- Toggler/collapsibe Button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+
     </div>
-    <ul class="nav navbar-nav">
-      <li class="nav-item active">
-        <a href='{% url "index" %}'>Home</a>
-      </li>
-
-      <li class="nav-item">
-        <a href="/#about">About</a>
-      </li>
-
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="/#departments" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Department
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Department</a>
-          <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Departments</a>
-        </div>
-      </li>
-
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Student & Teachers
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="{% url 'students:all_students' %}">Students</a>
-          <a class="dropdown-item" href="{% url 'teachers:all_teachers' %}">Teachers</a>
-
-          {% if user.is_authenticated %}
-            <a class="dropdown-item" href="{% url 'students:student_register' %}">Register as Student</a>
-            <a class="dropdown-item" href="{% url 'teachers:teacher_register' %}">Register as Teacher</a>
-          {% endif %}
-        </div>
-      </li>
-
-      {% if user.is_authenticated  %}
-
-        {% if user.is_superuser %}
-      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Status: Superuser
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-
-            <a class="dropdown-item" href="/admin/">Admin</a>
-            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-          </div>
-      </li>
-
-        {% elif user.teacher.ID_Number %}
-      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Status: Teacher
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-
-            <a class="dropdown-item" href="{% url 'teachers:teacher_detail' department_slug=user.teacher.department.department_slug teacher_slug=user.teacher.teacher_slug %}">Profile</a>
-            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-          </div>
-      </li>
-
-        {% elif user.student.ID_Number %}
-      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Status: Student
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="{% url 'students:student_detail' department_slug=user.student.department.department_slug student_slug=user.student.student_slug %}">Profile</a>
-            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-          </div>
-      </li>
-        {% endif %}
-
-        {% else %}
-      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Login & Register
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="{% url 'user_login' %}">Login</a>
-          </div>
-
-<!--        <li class="nav-item dropdown">-->
-          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Register
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="{% url 'students:student_register' %}">As a Student</a>
-            <a class="dropdown-item" href="{% url 'teachers:teacher_register' %}">As a Teacher</a>
-          </div>
-<!--        </li>-->
-
-
-      </li>
-
-        {% endif %}
-
-    </ul>
   </div>
 </nav>
 
+  <div style="padding-top:100px;">
   {% block body_block %}
 
   {% endblock %}
+  </div>
 
   <!-- ======= Footer ======= -->
   <footer id="footer">

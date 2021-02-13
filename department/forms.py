@@ -5,7 +5,7 @@ from .models import Department, DepartmentImages
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ('name', 'chairman', 'detail', 'established_date')
+        fields = ('name', 'chairman', 'detail')
 
 
 class DepartmentImageForm(forms.ModelForm):
