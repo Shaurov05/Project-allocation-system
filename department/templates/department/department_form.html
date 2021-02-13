@@ -1,0 +1,45 @@
+{% extends "department/department_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+    {% if user.is_superuser %}
+    <form id="department_form" method="post" action="" enctype="multipart/form-data">
+
+      {% csrf_token %}
+      <h1>Create New Department</h1>
+
+      {% for hidden in department_form.hidden_fields %}
+          {{ hidden }}<br>
+      {% endfor %}
+
+      {% bootstrap_form department_form %}
+
+      <div>
+        <div class="form-group">
+          <label for="established_date">Established Date</label>
+          <input type="date" id="established_date" name="established_date"
+            placeholder="dd-mm-yyyy" value=""
+            min="1997-01-01" max="2030-12-31">
+        </div>
+      </div>
+
+
+      <br>
+      {{ formset.management_form }}
+      {% for form in formset %}
+          {{ form }}<br><br>
+      {% endfor %}
+
+      <br>
+      <input type="submit" name="submit" value="Create Department" />
+    </form>
+    {% else %}
+    <h2>You must be a superuser to Create Department</h2>
+    {% endif %}
+  </div>
+</section>
+<br><br>
+{% endblock %}

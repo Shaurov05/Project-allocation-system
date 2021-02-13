@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{# at the terminal, run pip install django-bootstrap4 #}
+{% load bootstrap4 %}
+
+{% block body_block %}
+<section  id="steps" class="steps section-bg">
+
+  <div class="container jumbotron">
+      {% if messages %}
+
+        {% for message in messages %}
+        <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong> {{ message }} </strong>
+        </div>
+        {% endfor %}
+
+      {% endif %}
+
+    <h1>Login</h1>
+
+    <form method="POST" class="form">
+      {% csrf_token %}
+            {# A more "HTML" way of creating the login form#}
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Enter Username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" class="form-control" id="password" placeholder="Password">
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+
+    </form>
+  </div>
+
+<div class="container">
+  <h5>If you aren't a registered student or teacher, please go to registration
+    page to complete your registration.
+  <a style="text-decoration:underline;" href="{% url 'registration_options' %}">Registration</a> </h5>
+
+</div>
+</section>
+{% endblock %}

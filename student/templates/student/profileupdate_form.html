@@ -1,0 +1,54 @@
+{% extends "student/student_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<div class="container card border border-danger" style="background-color:#e0dada; width: 58rem; color:#8c000c">
+  <div card-body>
+    {% if user_form_errors %}
+    <h4>Validation Error</h4>
+    <h6>Check these fileds:</h6>
+  {% endif %}
+
+  {% if user_form_errors %}
+    <ul>
+      {% for error in user_form_errors %}
+      <li>
+        {{ error }}
+      </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if student_profile_form_errors %}
+    <ul>
+      {% for error in student_profile_form_errors %}
+      <li>
+        {{ error }}
+      </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  </div>
+</div>
+
+<br><br><br>
+
+<section id="steps" class="steps section-bg">
+  <div class="container">
+    <form  method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% bootstrap_form user_form %}
+
+      {% bootstrap_form profile_form %}
+
+      <br>
+      <button class="btn btn-primary" type="submit" name="button">Update Profile</button>
+      <br><br>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
