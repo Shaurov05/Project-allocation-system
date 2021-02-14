@@ -5,7 +5,7 @@
 
 <div class="container card border border-danger" style="background-color:#e0dada; width: 58rem; color:#8c000c">
   <div card-body>
-    {% if user_form_errors %}
+    {% if user_form_errors or student_profile_form_errors  %}
     <h4>Validation Error</h4>
     <h6>Check these fileds:</h6>
   {% endif %}

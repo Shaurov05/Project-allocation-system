@@ -15,13 +15,26 @@ class TeacherForm(forms.ModelForm):
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("Confirm_Password")
 
+        if password == '':
+            raise forms.ValidationError(
+                "Please, Enter a valid password"
+            )
+
         if password != confirm_password:
+            print(password)
+            print(confirm_password)
+            print("do not match")
             raise forms.ValidationError(
                 "password and confirm_password does not match"
+            )
+
+        if not cleaned_data.get("email"):
+            raise forms.ValidationError(
+                "Please Enter valid Email address"
             )
 
 
 class TeacherProfileInfoForm(forms.ModelForm):
     class Meta():
         model = Teacher
-        fields = ('ID_Number' ,'department', 'academic_rank', 'portfolio_site', 'profile_pic')
+        fields = ('ID_Number', 'department', 'academic_rank', 'portfolio_site', 'profile_pic')

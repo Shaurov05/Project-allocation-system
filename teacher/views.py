@@ -55,6 +55,7 @@ def teacher_register(request):
             # Set One to One relationship between
             # TeacherForm and TeacherProfileInfoForm
             teacher_profile.user = user
+            teacher_profile.created_by = request.user
 
             if 'profile_pic' in request.FILES:
                 teacher_profile.profile_pic = request.FILES['profile_pic']
@@ -73,15 +74,21 @@ def teacher_register(request):
             print("\n\n****department: {} and teacher: {}***/n/n".format(dept_slug, teacher_slug))
 
             return HttpResponseRedirect(reverse('teachers:teacher_detail',
-                                kwargs={'department_slug':dept_slug,
-                                        'teacher_slug':teacher_slug}))
+                                kwargs={'department_slug': dept_slug,
+                                        'teacher_slug': teacher_slug}))
         else:
             print(teacher_form.errors, teacher_profile_form.errors)
+            return render(request, "teachers/teacher_registration.html",
+                          { 'registered': registered,
+                            'teacher_form': teacher_form,
+                            'teacher_profile_form': teacher_profile_form,
+                            'teacher_form_errors': teacher_form.errors,
+                            'teacher_profile_form_errors': teacher_profile_form.errors})
     else:
         teacher_form = TeacherForm()
         teacher_profile_form = TeacherProfileInfoForm()
 
-    return render(request, "teachers/teacher_registration.html",context={
+    return render(request, "teachers/teacher_registration.html", context={
                     'teacher_form':teacher_form,
                     'teacher_profile_form':teacher_profile_form,
                     'registered':registered})
@@ -123,7 +130,7 @@ def change_password(request):
         else:
             messages.error(request, "Please provide valid information")
     else:
-        form = PasswordChangeForm(request, user)
+        form = PasswordChangeForm(request, request.user)
     return render(request, 'teachers/change_password.html',{
                             'form':form})
 
@@ -153,9 +160,80 @@ class TeacherList(SelectRelatedMixin, ListView):
     #     return context
 
 
+def getForms(request, student_slug):
+    if request.method == 'POST':
+        if not request.user.is_superuser:
+            user_form = StudentForm(request.POST, instance=request.user)
+            student_profile_form = StudentProfileInfoForm(request.POST, instance=request.user.student)
+            department_slug = request.user.student.department.department_slug
+            return user_form, student_profile_form, department_slug
+        else:
+            print("admin")
+            student = Student.objects.get(student_slug=student_slug)
+            user_form = StudentForm(request.POST, instance=student.user)
+            student_profile_form = StudentProfileInfoForm(request.POST, instance=student)
+            department_slug = student.department.department_slug
+            return user_form, student_profile_form, department_slug
+    else:
+        if not request.user.is_superuser:
+            user_form = StudentForm( instance=request.user)
+            student_profile_form = StudentProfileInfoForm(instance=request.user.student)
+            return user_form, student_profile_form
+        else:
+            print("admin")
+            student = Student.objects.get(student_slug=student_slug)
+            user_form = StudentForm( instance=student.user)
+            student_profile_form = StudentProfileInfoForm( instance=student)
+            return user_form, student_profile_form
+
+
+from django.db import transaction
+@login_required
+@transaction.atomic
+def update_teacher_profile(request, student_slug):
+
+    if request.method == 'POST':
+        user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
+
+        if user_form.is_valid() and student_profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+
+            student_profile_form.save(commit=False)
+            student_profile.updated_by = request.user
+
+            user.save()
+            student_profile.save()
+
+            messages.success(request, ('Your profile is successfully updated!'))
+            return redirect(reverse('students:student_detail', kwargs={
+                                    'student_slug': student_slug,
+                                    'department_slug': department_slug}))
+        else:
+            messages.error(request, ('Please check the error below.'))
+            user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
+
+            user_form_errors = user_form.errors
+            student_profile_form_errors = student_profile_form.errors
+            return render(request, 'student/profileupdate_form.html', {
+                'user_form': user_form,
+                'profile_form': student_profile_form,
+                'user_form_errors':user_form_errors,
+                'student_profile_form_errors':student_profile_form_errors
+            })
+    else:
+        user_form, student_profile_form = getForms(request, student_slug=student_slug)
+
+    return render(request, 'student/profileupdate_form.html', {
+        'user_form': user_form,
+        'profile_form': student_profile_form,
+    })
+
+
 class TeacherUpdateView(InlineFormSetFactory):
     model = Teacher
     fields = ['profile_pic','department', 'portfolio_site','academic_rank']
+
 
 class TeacherAccountEditView(UpdateWithInlinesView):
     model = User
