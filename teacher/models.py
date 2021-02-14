@@ -26,8 +26,8 @@ class Teacher(models.Model):
     academic_rank = models.CharField(blank=False, max_length=100, choices=teacher_rank)
     teacher_slug = models.SlugField(allow_unicode=True, unique=True)
 
-    created_by = models.ForeignKey(User, blank=False, related_name="teacher_created_by", on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, blank=False, related_name="teacher_updated_by", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name="teacher_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, null=True, blank=True, related_name="teacher_updated_by", on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -45,4 +45,4 @@ class Teacher(models.Model):
 
     class Meta:
         ordering = ["id"]
-        unique_together = ["id", "department"]
+        unique_together = ["user", "department"]

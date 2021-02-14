@@ -51,10 +51,10 @@ def student_register(request):
             # Now we deal with the extra info!
             # Can't commit yet because we still need to manipulate
             student_profile = student_profile_form.save(commit=False)
+            student_profile.created_by = request.user
             # Set One to One relationship between
             # StudentForm and StudentProfileInfoForm
-            if request.user:
-                student_profile.user = user
+            student_profile.user = user
 
             if 'profile_pic' in request.FILES:
                 student_profile.profile_pic = request.FILES['profile_pic']
@@ -75,7 +75,12 @@ def student_register(request):
             return HttpResponseRedirect(reverse('students:student_detail', kwargs={'department_slug':dept_slug, 'student_slug':student_slug}))
         else:
             print(student_form.errors, student_profile_form.errors)
-            return HttpResponseRedirect(reverse('students:student_register', kwargs={"studentFormErrors":student_form.errors, "studentProfileErrors":student_profile_form.errors}))
+            return render(request, 'student/student_registration.html', {
+                'user_form': user_form,
+                'profile_form': student_profile_form,
+                'user_form_errors': student_form.errors,
+                'student_profile_form_errors': student_profile_form.errors
+            })
     else:
         student_form = StudentForm()
         student_profile_form = StudentProfileInfoForm()
@@ -150,6 +155,7 @@ class StudentList(SelectRelatedMixin, ListView):
     #     # context['current_month'] = self.current_month
     #     return context
 
+
 def getForms(request, student_slug):
     if request.method == 'POST':
         if not request.user.is_superuser:
@@ -189,8 +195,11 @@ def update_student_profile(request, student_slug):
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
 
+            student_profile_form.save(commit=False)
+            student_profile.updated_by = request.user
+
             user.save()
-            student_profile_form.save()
+            student_profile.save()
 
             messages.success(request, ('Your profile is successfully updated!'))
             return redirect(reverse('students:student_detail', kwargs={

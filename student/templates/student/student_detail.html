@@ -16,7 +16,7 @@
              <img class="img-fluid" src="{{ student_detail.profile_pic.url }}" alt="">
 
              <div class="portfolio-info">
-               <h4>{{ faculty.name }}</h4>
+               <h4>{{ student.department }}</h4>
 
              <div class="portfolio-links">
                <h5><a href='{{ student_detail.profile_pic.url }}' title="More Details"><i class="bx bx-link"></i>Full Picture</a></h5>
@@ -25,7 +25,7 @@
            </div>
 
             {% else %}
-              <img class="img-fluid"  src="/static/no_profile_pic.png" alt="">
+              <img class="img-fluid" style="width: 80%;background-size: contain; height: 100px; " src="/static/no_profile_pic.png" alt="">
             {% endif %}
 
       </div>

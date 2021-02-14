@@ -1,6 +1,6 @@
 {% extends "teachers/teacher_base.html" %}
 {% block content %}
-
+{% load static %}
 
 <section id="portfolio" class="portfolio section-bg">
 
@@ -13,13 +13,13 @@
              <img class="img-fluid" src="{{ teacher_detail.profile_pic.url }}" alt="">
 
              <div class="portfolio-info">
-               <h4>{{ faculty.name }}</h4>
+               <h4>{{ teacher_detail.department.name }}</h4>
 
              <div class="portfolio-links">
                <h5><a href='{{ teacher_detail.profile_pic.url }}' title="More Details"><i class="bx bx-link"></i>Full Picture</a></h5>
              </div>
 
-           </div>
+              </div>
 
             {% else %}
               <img class="img-fluid"  src="/static/no_profile_pic.png" alt="">
@@ -31,7 +31,7 @@
     <div class="col-lg-8 col-md-6 portfolio-item filter-faculty">
       <table id="details_table_teacher">
         <tr>
-          <td> <p>Teacher Name: </p> </td>
+          <td> <p>Teacher Username: </p> </td>
           <td><p><span style="color:#2f5b9c;">{{teacher_detail.user.username}}</span></p> </td>
         </tr>
 
@@ -42,7 +42,7 @@
 
         <tr>
           <td> <p>Teacher ID: </td>
-          <td> <span style="color:#2f5b9c;">{{teacher_detail.Teacher_ID}}</p> </td>
+          <td> <span style="color:#2f5b9c;">{{teacher_detail.ID_Number}}</p> </td>
         </tr>
 
         <tr>
@@ -50,18 +50,13 @@
           {% if teacher_detail.user.email %}
             <td><p> <span style="color:#2f5b9c;"> {{teacher_detail.user.email}}</p></td>
           {% else %}
-            <td><p> <span style="color:#2f5b9c;">Not given</p> </td>
+            <td><p> <span style="color:#2f5b9c;">Not given <span> </p> </td>
           {% endif %}
         </tr>
 
         <tr>
           <td> <p>Department:  </td>
-          <td><span style="color:#2f5b9c;"><a href="{% url 'departments:department_detail' faculty_slug=teacher_detail.department.faculty.faculty_slug department_slug=teacher_detail.department.department_slug %}">{{teacher_detail.department}}</a>  </td>
-        </tr>
-
-        <tr>
-          <td><p>Faculty: </td>
-          <td> <span style="color:#2f5b9c;"><a href="{% url 'faculties:faculty_detail' faculty_slug=teacher_detail.department.faculty.faculty_slug %}">{{teacher_detail.department.faculty}}</a> </p></td>
+          <td><span style="color:#2f5b9c;"><a href="{% url 'departments:department_detail' department_slug=teacher_detail.department.department_slug %}">{{teacher_detail.department}}</a>  </td>
         </tr>
 
         <tr>
