@@ -100,7 +100,7 @@
   <!-- ======= Header ======= -->
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark ">
   <div class="container-fluid">
-    <div class="row">
+    <div class="row container">
       <div class="col-md-3">
         <div class="navbar-header" >
           <a style="font-size:25px;" class="navbar-brand" href='{% url "index" %}'>Project Allocation System</a>
@@ -158,7 +158,7 @@
             {% if user.is_authenticated  %}
 
               {% if user.is_superuser %}
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown dropdown2">
                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Status: Superuser
                 </a>
@@ -170,7 +170,7 @@
             </li>
 
               {% elif user.teacher.ID_Number %}
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown dropdown2">
                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Status: Teacher
                 </a>
@@ -182,7 +182,7 @@
             </li>
 
               {% elif user.student.ID_Number %}
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown dropdown2">
                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Status: Student
                 </a>
@@ -195,28 +195,18 @@
 
               {% else %}
 
-            <li class="nav-item nav-link">
-
-            </li>
-
             <li class="nav-item">
               <a class="nav-link" href="{% url 'user_login' %}">Login</a>
             </li>
 
-            <li class="nav-item nav-link">
-
-            </li>
-
               {% endif %}
-
-
 
           </ul>
         </div>
 
       </div>
 
-      <div class="col-md-1" style="width:80px;
+      <div class="col-md-0" style="width:80px;
                                     height:80px;
                                     top:10px;
                                     right:10px;

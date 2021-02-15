@@ -7,8 +7,7 @@
 			<li> {{ teacher.user.username  }} </li>
       <li> {{ teacher.teacher_ID  }} </li>
       <li> {{ teacher.email  }} </li>
-      <li> <a href="{% url 'departments:detail' faculty_slug=teacher.department.faculty.faculty_slug department_slug=teacher.department.department_slug %}">{{ teacher.department.name }}</a> </li>
-      <li> <a href="{% url 'faculties:detail' slug=teacher.department.faculty.slug %}">{{ teacher.department.faculty.name }}</a> </li>
+      <li> <a href="{% url 'departments:detail' department_slug=teacher.department.department_slug %}">{{ teacher.department.name }}</a> </li>
 
     </ol>
 

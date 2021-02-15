@@ -8,9 +8,7 @@
     <h5>Teachers are listed below</h5>
     <h6>Total teachers in UIT: {{teachers.count}}</h6>
 
-    <br><br>
-    <h6><span style="font-weight:bold">Total teachers:</span> {{department.teachers.count }}</h2>
-
+    <br>
     <br>
 
   </div>
@@ -45,7 +43,7 @@
 
           <td><p> <a href="{% url 'teachers:teacher_detail' department_slug=teacher.department.department_slug teacher_slug=teacher.teacher_slug %} " style="color:#1bac91; font-size:19px"> {{teacher.user.username}}</a> </h4></td>
           <td> {{teacher.academic_rank}} </td>
-          <td> {{ teacher.Teacher_ID }} </td>
+          <td> {{ teacher.ID_Number }} </td>
 
           {% if teacher.user.email %}
             <td><p> <span style="color:#2f5b9c;"> {{teacher.user.email}}</p></td>
@@ -53,7 +51,7 @@
             <td><p> <span style="color:#2f5b9c;">Not given</p> </td>
           {% endif %}
 
-          <td> {{ teacher.department.acronyms }} </td>
+          <td> <a href="{% url 'departments:department_detail' department_slug=teacher.department.department_slug %}"> {{ teacher.department.acronyms }} </a> </td>
           <td><p> <span style="color:#2f5b9c;">{{teacher.session}}</p> </td>
         </tr>
         <tr >
