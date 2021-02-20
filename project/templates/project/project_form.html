@@ -1,0 +1,26 @@
+{% extends "department/department_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+    {% if user.is_superuser %}
+    <form id="department_form" method="post" action="" enctype="multipart/form-data">
+
+      {% csrf_token %}
+      <h1>Create New Project</h1>
+
+      {% bootstrap_form form %}
+
+
+      <br>
+      <input type="submit" name="submit" value="Create Department" />
+    </form>
+    {% else %}
+    <h2>You must be a superuser to Create Department</h2>
+    {% endif %}
+  </div>
+</section>
+<br><br>
+{% endblock %}

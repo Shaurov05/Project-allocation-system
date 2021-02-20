@@ -3,9 +3,11 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
-#details_table {
+#details_table, table, th, td {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  width: 80%;
+  border: 1px solid black;
+  border-collapse: collapse;
+  // width: 100%;
 }
 
 #details_table .extra-row{
@@ -13,20 +15,20 @@
 }
 
 #details_table tr, #details_table td, #details_table th {
-  border: 0px solid #ddd;
+  border: 1px solid #0f1012;
 
 }
 
 
 #details_table_teacher {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
+  //border-collapse: collapse;
   width: 100%;
 }
 
 #details_table_teacher td {
   padding: 5px 5px 5px 10px;
-  border: 0px solid #ddd;
+  border: 1px solid #293245;
 }
 #details_table_teacher tr:nth-child(even){background-color: #d9d8d4;}
 #details_table_teacher tr:nth-child(odd){background-color: #f7f7f2;}
@@ -42,7 +44,7 @@
   padding-bottom: 12px;
   padding-right: 0px;
   padding-left: 12px;
-  text-align: left;
+  text-align: center;
   background-color: #7a786e;
   color: white;
 }

@@ -1,27 +1,24 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Student
-
-class StudentForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
-    Confirm_Password = forms.CharField(label='confirm your password',widget=forms.PasswordInput())
-
-    class Meta():
-        model = User
-        fields = ('username', 'email', 'password')
-
-    def clean(self):
-        cleaned_data = super(StudentForm, self).clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("Confirm_Password")
-
-        if password != confirm_password:
-            raise forms.ValidationError(
-                "password and confirm_password does not match"
-            )
+from .models import Project
+from department.models import Department
+from student.models import Student
 
 
-class StudentProfileInfoForm(forms.ModelForm):
-    class Meta():
-        model = Student
-        fields = ('student_ID', 'session', 'department', 'profile_pic')
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        # fields = ['name', 'date', 'members']
+        fields = ['name', 'project_details']
+    # name = forms.CharField()
+    # date = forms.DateInput()
+
+    # students = forms.ModelMultipleChoiceField(
+    #     queryset=Student.objects.all(),
+    #     widget=forms.CheckboxSelectMultiple
+    # )
+
+    departments = forms.ModelMultipleChoiceField(
+        queryset=Department.objects.all(),
+        widget=forms.CheckboxSelectMultiple
+    )

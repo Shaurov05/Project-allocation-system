@@ -39,6 +39,7 @@ urlpatterns = [
     path('departments/', include("department.urls", namespace='departments')),
     path('students/', include("student.urls", namespace='students')),
     path('teachers/', include("teacher.urls", namespace='teachers')),
+    path('projects/', include("project.urls", namespace='projects')),
 
     re_path(r"^.*$", ErrorTemplateView.as_view(), name='entry-point'),
 
