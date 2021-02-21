@@ -24,6 +24,7 @@ from django.utils.text import slugify
 
 from .forms import StudentForm, StudentProfileInfoForm
 from .models import Student
+from teacher.models import Teacher
 from department.models import Department
 
 @login_required
@@ -45,13 +46,13 @@ def student_register(request):
 
             # Hash the password
             user.set_password(user.password)
-            # Update with Hashed password
-            user.save()
 
             # Now we deal with the extra info!
             # Can't commit yet because we still need to manipulate
             student_profile = student_profile_form.save(commit=False)
-            student_profile.created_by = request.user
+
+            if not request.user.is_anonymous:
+                student_profile.created_by = request.user
             # Set One to One relationship between
             # StudentForm and StudentProfileInfoForm
             student_profile.user = user
@@ -60,6 +61,7 @@ def student_register(request):
                 student_profile.profile_pic = request.FILES['profile_pic']
 
             # now saving the model
+            user.save()
             student_profile.save()
             registered = True
 
@@ -76,7 +78,7 @@ def student_register(request):
         else:
             print(student_form.errors, student_profile_form.errors)
             return render(request, 'student/student_registration.html', {
-                'user_form': user_form,
+                'user_form': student_form,
                 'profile_form': student_profile_form,
                 'user_form_errors': student_form.errors,
                 'student_profile_form_errors': student_profile_form.errors
@@ -156,31 +158,51 @@ class StudentList(SelectRelatedMixin, ListView):
     #     return context
 
 
-def getForms(request, student_slug):
+global user_profile_form
+def getForms(request, model, slug_instance, UserForm, UserProfileInfoForm):
     if request.method == 'POST':
         if not request.user.is_superuser:
-            user_form = StudentForm(request.POST, instance=request.user)
-            student_profile_form = StudentProfileInfoForm(request.POST, instance=request.user.student)
-            department_slug = request.user.student.department.department_slug
-            return user_form, student_profile_form, department_slug
+            user_form = UserForm(request.POST, instance=request.user)
+            if model == Student:
+                # print("student")
+                user_profile_form = UserProfileInfoForm(request.POST, instance=request.user.student)
+                department_slug = request.user.student.department.department_slug
+            else:
+                # print("teacher")
+                user_profile_form = UserProfileInfoForm(request.POST, instance=request.user.teacher)
+                department_slug = request.user.teacher.department.department_slug
+
+            return user_form, user_profile_form, department_slug
         else:
             print("admin")
-            student = Student.objects.get(student_slug=student_slug)
-            user_form = StudentForm(request.POST, instance=student.user)
-            student_profile_form = StudentProfileInfoForm(request.POST, instance=student)
-            department_slug = student.department.department_slug
-            return user_form, student_profile_form, department_slug
+            if model == Student:
+                instance = model.objects.get(student_slug=slug_instance)
+            else:
+                instance = model.objects.get(teacher=slug_instance)
+
+            user_form = UserForm(request.POST, instance=instance.user)
+            profile_form = UserProfileInfoForm(request.POST, instance=instance)
+            department_slug = instance.department.department_slug
+            return user_form, profile_form, department_slug
     else:
         if not request.user.is_superuser:
-            user_form = StudentForm( instance=request.user)
-            student_profile_form = StudentProfileInfoForm(instance=request.user.student)
-            return user_form, student_profile_form
+            user_form = UserForm(instance=request.user)
+            if model == Student:
+                user_profile_form = UserProfileInfoForm(instance=request.user.student)
+            else:
+                user_profile_form = UserProfileInfoForm(instance=request.user.teacher)
+
+            return user_form, user_profile_form
         else:
             print("admin")
-            student = Student.objects.get(student_slug=student_slug)
-            user_form = StudentForm( instance=student.user)
-            student_profile_form = StudentProfileInfoForm( instance=student)
-            return user_form, student_profile_form
+            if model == Student:
+                instance = model.objects.get(student_slug=slug_instance)
+            else:
+                instance = model.objects.get(teacher=slug_instance)
+
+            user_form = UserForm( instance=instance.user)
+            profile_form = UserProfileInfoForm( instance=instance)
+            return user_form, profile_form
 
 
 from django.db import transaction
@@ -189,17 +211,20 @@ from django.db import transaction
 def update_student_profile(request, student_slug):
 
     if request.method == 'POST':
-        user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
+        user_form, student_profile_form, department_slug = getForms(request, model=Student,
+                                                                    slug_instance=student_slug,
+                                                                    UserForm=StudentForm,
+                                                                    UserProfileInfoForm=StudentProfileInfoForm)
 
         if user_form.is_valid() and student_profile_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
 
             student_profile_form.save(commit=False)
-            student_profile.updated_by = request.user
+            student_profile_form.updated_by = request.user
 
             user.save()
-            student_profile.save()
+            student_profile_form.save()
 
             messages.success(request, ('Your profile is successfully updated!'))
             return redirect(reverse('students:student_detail', kwargs={
@@ -207,8 +232,6 @@ def update_student_profile(request, student_slug):
                                     'department_slug': department_slug}))
         else:
             messages.error(request, ('Please check the error below.'))
-            user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
-
             user_form_errors = user_form.errors
             student_profile_form_errors = student_profile_form.errors
             return render(request, 'student/profileupdate_form.html', {
@@ -218,7 +241,10 @@ def update_student_profile(request, student_slug):
                 'student_profile_form_errors':student_profile_form_errors
             })
     else:
-        user_form, student_profile_form = getForms(request, student_slug=student_slug)
+        user_form, student_profile_form = getForms(request, model=Student,
+                                                        slug_instance=student_slug,
+                                                        UserForm=StudentForm,
+                                                        UserProfileInfoForm=StudentProfileInfoForm)
 
     return render(request, 'student/profileupdate_form.html', {
         'user_form': user_form,

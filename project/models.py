@@ -11,16 +11,16 @@ from django.utils.text import slugify
 
 
 class Project(models.Model):
-    department = models.ForeignKey(Department,blank=False, related_name="department_projects", on_delete=models.CASCADE)
-    # student_ID_no = models.CharField(max_length=20, unique=True, blank=False)
-    students = models.ManyToManyField(User, through="ProjectChoices")
+    departments = models.ManyToManyField(Department, through="DepartmentProject")
+    students = models.ManyToManyField(User, through="ProjectChoice")
 
     name = models.CharField(max_length=300, blank=False)
+    project_details = models.TextField()
     project_slug = models.SlugField(allow_unicode=True, unique=True)
-    session = models.CharField(max_length=9, blank=False)
+    available = models.BooleanField(default=True)
 
-    created_by = models.ForeignKey(User, blank=False, related_name="project_created_by", on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, blank=False, related_name="project_updated_by", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, blank=True, null=True, related_name="project_created_by", on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, blank=True, null=True, related_name="project_updated_by", on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -33,24 +33,28 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse("projects:project_detail",
-                        kwargs={'department_slug':self.department.department_slug, "project_slug":self.project_slug})
-
-    # class Meta:
-    #     ordering = ["id"]
-    #     unique_together = ["student", "department"]
+                        kwargs={"project_slug":self.project_slug})
 
 
-class ProjectChoices(models.Model):
+class ProjectChoice(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="student_project_choices")
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="students")
     rank = models.IntegerField(choices=(("1", "1"), ("2", "2"), ("3", "3")), blank=False)
     datetime = models.DateTimeField(auto_now=True)
-    available = models.BooleanField(default=True)
 
     def __str__(self):
         return self.project.name
 
     class Meta:
         unique_together = ("project", "student")
+
+
+class DepartmentProject(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="department_projects")
+    department = models.ForeignKey(Department, related_name="departments", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.project.name
+
 
 

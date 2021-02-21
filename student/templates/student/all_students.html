@@ -12,49 +12,48 @@
   </div>
 
 {% if students %}
-  <div class="container">
+  <div class="container table-responsive">
     <section id="steps" class="steps section-bg" style="background-color:#fafcff">
 
 
       <hr>
 
-      <table id="details_table" align="center">
-        <thead style="color:blue">
-          <th>Profile Pic</th>
-          <th> <p>Student Username </p> </th>
-          <th> <p>Student ID</p> </th>
-          <th> <p>Email</p> </th>
-          <th><p>Department</p> </th>
-          <th> <p>Session </p> </th>
+      <table style="border: 1px solid black;" id="details_table" class="table table-bordered table-striped" align="center">
+        <thead >
+          <th> Profile Pic </th>
+          <th> Student Username </th>
+          <th> Student ID </th>
+          <th> Email </th>
+          <th> Department </th>
+          <th> Session  </th>
         </thead>
-        <tr >
-          <td class="extra-row"><br> </td>
-          <td class="extra-row"><br> </td>
-        </tr>
 
         {% for student in students %}
-        <tr>
+        <tr >
+          <td style="0px solid #0f1012"><br> </td>
+        </tr>
+
+        <tr style="border: 1px solid black;">
           {% if student.profile_pic %}
            <td><img src="{{ student.profile_pic.url }}"  height=120 width=120 alt=""></td>
           {% else %}
             <td><img src="/static/no_profile_pic.png"  height=120 width=120 alt=""></td>
           {% endif %}
 
-          <td><p> <a href="{% url 'students:student_detail' department_slug=student.department.department_slug student_slug=student.student_slug %} " style="color:#1bac91; font-size:19px"> {{student.user.username}}</a> </h4></td>
-          <td> {{ student.student_ID }} </td>
+          <td> <a href="{% url 'students:student_detail' department_slug=student.department.department_slug student_slug=student.student_slug %} " style="color:#1bac91; font-size:19px"> {{student.user.username}}</a> </h4></td>
+          <td> {{ student.ID_Number }} </td>
 
           {% if student.user.email %}
-            <td><p> <span style="color:#2f5b9c;"> {{student.user.email}}</p></td>
+            <td> <span style="color:#2f5b9c;"> {{student.user.email}}</span></td>
           {% else %}
-            <td><p> <span style="color:#2f5b9c;">Not given</p> </td>
+            <td> <span style="color:#2f5b9c;">Not given </span></td>
           {% endif %}
 
-          <td> {{ student.department.acronyms }} </td>
-          <td><p> <span style="color:#2f5b9c;">{{student.session}}</p> </td>
+          <td> <a href="{% url 'departments:department_detail' department_slug=student.department.department_slug %}"> {{ student.department.name }} </a> </td>
+          <td> <span style="color:#2f5b9c;">{{student.session}} </span> </td>
         </tr>
 
         <tr >
-          <td class="extra-row"><br> </td>
         </tr>
         <tr >
         </tr>

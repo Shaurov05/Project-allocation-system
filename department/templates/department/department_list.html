@@ -18,10 +18,9 @@
       <hr>
       <ul>
 
-        <li> <h4>Department: <a href="{% url 'departments:department_detail' faculty_slug=department.faculty.faculty_slug department_slug=department.department_slug %}"> {{department.name}}</h2></a> </li>
+        <li> <h4>Department: <a href="{% url 'departments:department_detail'  department_slug=department.department_slug %}"> {{department.name}}</h2></a> </li>
         <ul>
           <li> <h6> Chairman : {{department.chairman}} </h3> </li>
-          <li><h6>Faculty : {{department.faculty.name}}</h2> </li>
           <li><h6>Total teachers in {{department.name}} : {{department.teachers.count}} </h2></li>
           <li><h6>Total students in {{department.name}} : {{department.students.count}} </h2></li>
           <li> <h6>Established at: {{department.established_date}}</h2> </li>

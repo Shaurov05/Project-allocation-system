@@ -4,6 +4,36 @@
 {% block content %}
 
 <section id="steps" class="steps section-bg">
+  <div class="container card border border-danger" style="background-color:#e0dada; width: 50rem; color:#8c000c">
+    <div card-body>
+      {% if departmentForm_errors or formset_errors %}
+      <h4>Validation Error</h4>
+      <h6>Check these fileds:</h6>
+    {% endif %}
+
+    {% if departmentForm_errors %}
+      <ul>
+        {% for error in departmentForm_errors %}
+        <li>
+          {{ error }}
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if formset_errors %}
+      <ul>
+        {% for error in formset_errors %}
+        <li>
+          {{ error }}
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    </div>
+  </div>
+
   <div class="container jumbotron">
     {% if user.is_superuser %}
     <form id="department_form" method="post" action="" enctype="multipart/form-data">

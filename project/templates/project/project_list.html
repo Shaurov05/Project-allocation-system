@@ -1,0 +1,43 @@
+{% extends "department/department_base.html" %}
+
+{% block content %}
+
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+    {% if projects.count == 0 %}
+      <h4>No projects created till now. This site is under construction.</h4>
+    {% else %}
+      <h4>Welcome to All project page of UIC</h4>
+      <h5>Number of projects : {{projects.count}}</h5>
+  </div>
+
+  <div class="container">
+
+    {% for project in projects %}
+      <hr>
+      <ul>
+
+        <li> <h4> <a href="{% url 'projects:project_detail' project_slug=project.project_slug %}">{{project.name}}</a> </h4></a> </li>
+        <ul>
+          <li> <h6>{{project.project_details}} </h6> </li>
+
+          <ul>
+            {% if project.departments.count != 0 %}
+              <li> Deaprtment having this project: {{project.departments.count}}</li>
+
+            {% else %}
+              <li>No departments added!</li>
+            {% endif %}
+          </ul>
+        </ul>
+
+      </ul><hr>
+    {% endfor %}
+  </div>
+{% endif %}
+
+</section>
+
+
+{% endblock %}

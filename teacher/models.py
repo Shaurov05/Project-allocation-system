@@ -22,7 +22,7 @@ class Teacher(models.Model):
 
     profile_pic = models.ImageField(upload_to='teachers/profile_pics', blank=True)
     ID_Number = models.CharField(max_length=20, unique=True, blank=False)
-    portfolio_site = models.URLField(blank=True)
+    portfolio_site = models.URLField(blank=True, null=True)
     academic_rank = models.CharField(blank=False, max_length=100, choices=teacher_rank)
     teacher_slug = models.SlugField(allow_unicode=True, unique=True)
 

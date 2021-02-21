@@ -46,8 +46,6 @@ def teacher_register(request):
 
             # Hash the password
             user.set_password(user.password)
-            # Update with Hashed password
-            user.save()
 
             # Now we deal with the extra info!
             # Can't commit yet because we still need to manipulate
@@ -55,12 +53,16 @@ def teacher_register(request):
             # Set One to One relationship between
             # TeacherForm and TeacherProfileInfoForm
             teacher_profile.user = user
-            teacher_profile.created_by = request.user
+
+            if not request.user.is_anonymous:
+                print(request.user)
+                teacher_profile.created_by = request.user
 
             if 'profile_pic' in request.FILES:
                 teacher_profile.profile_pic = request.FILES['profile_pic']
 
             # now saving the model
+            user.save()
             teacher_profile.save()
             registered = True
 
@@ -141,7 +143,7 @@ class TeacherDetailView(SelectRelatedMixin, DetailView):
     model = Teacher
     template_name = 'teachers/teacher_detail.html'
 
-    def get_object(self):
+    def get_object(self, **kwargs):
         return get_object_or_404(
             Teacher,
             teacher_slug=self.kwargs['teacher_slug']
@@ -160,129 +162,59 @@ class TeacherList(SelectRelatedMixin, ListView):
     #     return context
 
 
-def getForms(request, student_slug):
-    if request.method == 'POST':
-        if not request.user.is_superuser:
-            user_form = StudentForm(request.POST, instance=request.user)
-            student_profile_form = StudentProfileInfoForm(request.POST, instance=request.user.student)
-            department_slug = request.user.student.department.department_slug
-            return user_form, student_profile_form, department_slug
-        else:
-            print("admin")
-            student = Student.objects.get(student_slug=student_slug)
-            user_form = StudentForm(request.POST, instance=student.user)
-            student_profile_form = StudentProfileInfoForm(request.POST, instance=student)
-            department_slug = student.department.department_slug
-            return user_form, student_profile_form, department_slug
-    else:
-        if not request.user.is_superuser:
-            user_form = StudentForm( instance=request.user)
-            student_profile_form = StudentProfileInfoForm(instance=request.user.student)
-            return user_form, student_profile_form
-        else:
-            print("admin")
-            student = Student.objects.get(student_slug=student_slug)
-            user_form = StudentForm( instance=student.user)
-            student_profile_form = StudentProfileInfoForm( instance=student)
-            return user_form, student_profile_form
-
-
+from student.views import getForms
 from django.db import transaction
 @login_required
 @transaction.atomic
-def update_teacher_profile(request, student_slug):
+def update_teacher_profile(request, teacher_slug):
 
     if request.method == 'POST':
-        user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
+        user_form, teacher_profile_form, department_slug = getForms(request, model=Teacher,
+                                                                slug_instance=teacher_slug, UserForm=TeacherForm,
+                                                                UserProfileInfoForm=TeacherProfileInfoForm)
 
-        if user_form.is_valid() and student_profile_form.is_valid():
+        if user_form.is_valid() and teacher_profile_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
 
-            student_profile_form.save(commit=False)
-            student_profile.updated_by = request.user
+            teacher_profile_form.save(commit=False)
+            teacher_profile_form.updated_by = request.user
 
             user.save()
-            student_profile.save()
+            teacher_profile_form.save()
 
             messages.success(request, ('Your profile is successfully updated!'))
-            return redirect(reverse('students:student_detail', kwargs={
-                                    'student_slug': student_slug,
+            return redirect(reverse('teachers:teacher_detail', kwargs={
+                                    'teacher_slug': teacher_slug,
                                     'department_slug': department_slug}))
         else:
             messages.error(request, ('Please check the error below.'))
-            user_form, student_profile_form, department_slug = getForms(request, student_slug=student_slug)
-
             user_form_errors = user_form.errors
-            student_profile_form_errors = student_profile_form.errors
-            return render(request, 'student/profileupdate_form.html', {
+            teacher_profile_form_errors = teacher_profile_form.errors
+            return render(request, 'teachers/profileupdate_form.html', {
                 'user_form': user_form,
-                'profile_form': student_profile_form,
+                'profile_form': teacher_profile_form,
                 'user_form_errors':user_form_errors,
-                'student_profile_form_errors':student_profile_form_errors
+                'teacher_profile_form_errors':teacher_profile_form_errors
             })
     else:
-        user_form, student_profile_form = getForms(request, student_slug=student_slug)
+        user_form, ProfileInfoForm = getForms(request, model=Teacher,
+                                                        slug_instance=teacher_slug, UserForm=TeacherForm,
+                                                        UserProfileInfoForm=TeacherProfileInfoForm)
 
-    return render(request, 'student/profileupdate_form.html', {
+    return render(request, 'teachers/profileupdate_form.html', {
         'user_form': user_form,
-        'profile_form': student_profile_form,
+        'profile_form': ProfileInfoForm,
     })
-
-
-class TeacherUpdateView(InlineFormSetFactory):
-    model = Teacher
-    fields = ['profile_pic','department', 'portfolio_site','academic_rank']
-
-
-class TeacherAccountEditView(UpdateWithInlinesView):
-    model = User
-    fields = ['username', 'email', 'password']
-    inlines = [TeacherUpdateView,]
-    template_name = 'teachers/profileupdate_form.html'
-    old_password = []
-    old_password.clear()
-
-    def get_object(self):
-        user = User.objects.get(pk=self.request.user.pk)
-        self.old_password.append(user.password)
-        return user
-
-    def get_success_url(self):
-        user1 = self.get_object()
-        if self.old_password[1] == self.old_password[2]:
-            print("no change passsword ",user1.password)
-        else:
-            user1.set_password(user1.password)
-            print("password changed")
-
-        user1.save()
-        user1.teacher.save()
-        self.old_password.clear()
-
-        return get_object_or_404(
-                    Teacher,
-                    pk=user1.teacher.id
-                ).get_absolute_url()
-
-
-class TeacherUpdateView(LoginRequiredMixin,SelectRelatedMixin,  UpdateView):
-    login_url = '/teacher/login/'
-    select_related = ("user", "department")
-    redirect_field_name = '/department/<department_slug>/profile/<teacher_slug>/'
-
-    fields = ("username","password", "profile_pic")
-    model = Teacher
-    template_name = 'teachers/profileupdate_form.html'
 
 
 class TeacherDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
     login_url = '/teacher/login/'
-    redirect_field_name = 'blog/post_detail.html'
+    template_name = 'teachers/teacher_confirm_delete.html'
     model = Teacher
     select_related = ("user", "department")
 
-    def get_object(self):
+    def get_object(self, **kwargs):
         return Teacher.objects.get(teacher_slug=self.kwargs['teacher_slug'])
 
     def get_success_url(self):
