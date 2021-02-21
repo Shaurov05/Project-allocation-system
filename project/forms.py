@@ -10,15 +10,8 @@ class ProjectForm(forms.ModelForm):
         model = Project
         # fields = ['name', 'date', 'members']
         fields = ['name', 'project_details']
-    # name = forms.CharField()
-    # date = forms.DateInput()
 
-    # students = forms.ModelMultipleChoiceField(
-    #     queryset=Student.objects.all(),
+    # departments = forms.ModelMultipleChoiceField(
+    #     queryset=Department.objects.all(),
     #     widget=forms.CheckboxSelectMultiple
     # )
-
-    departments = forms.ModelMultipleChoiceField(
-        queryset=Department.objects.all(),
-        widget=forms.CheckboxSelectMultiple
-    )

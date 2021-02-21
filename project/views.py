@@ -31,11 +31,70 @@ class CreateProject(CreateView):
     success_url = reverse_lazy('index')
 
 
+from django.db import transaction
+@login_required
+@transaction.atomic
+def CreateNewProject(request):
+    departments = Department.objects.all()
+    try:
+        if not request.user.is_superuser or not request.user.teachers:
+            return HttpResponse("You must be a superuser or Teacher to create a project")
+    except Exception as ex:
+        print("first exception: ", ex)
+        if request.method == 'GET':
+            form = ProjectForm()
+            # students = Student.objects.all()
+
+            return render(request, "project/project_form.html",
+                          context={'form':form,
+                                   # 'students': students
+                                   'departments':departments,
+                                   })
+
+        elif request.method == 'POST':
+            project_form = ProjectForm(data=request.POST)
+
+            if project_form.is_valid():
+                instance = project_form.save()
+                try:
+                    selected_departments = request.POST.getlist("departments")
+                except:
+                    selected_departments = request.POST.getlist("departments")
+                print(selected_departments)
+                # print(instance.id)
+
+                for department_id in selected_departments:
+                    try:
+                        DepartmentProject.objects.create(project=instance,
+                                                         department_id=int(department_id))
+                    except Exception as ex:
+                        print("second exception: ",ex)
+                        # deleting the project
+                        project = Project.objects.get(id=instance.id)
+                        project.delete()
+                        messages.error(request, ('Check these errors'))
+                        return render(request, 'project/project_form.html', context={
+                            'form': ProjectForm(data=request.POST),
+                            'departments': departments,
+                            'formErrors': ex})
+            else:
+                messages.error(request, ('Check these errors'))
+                return render(request, 'project/project_form.html', context={
+                    'form': ProjectForm(data=request.POST),
+                    'departments': departments,
+                    'formErrors': ProjectForm.errors})
+
+        print(instance.project_slug)
+        return redirect(reverse('projects:project_detail',
+                            kwargs={"project_slug":instance.project_slug}))
+
+
 
 class ProjectDetailView(SelectRelatedMixin, DetailView):
-    context_object_name = 'project_detail'
-    model = Teacher
-    template_name = 'projects/project_detail.html'
+
+    model = Project
+    context_object_name = 'project_details'
+    template_name = 'project/project_detail.html'
 
     def get_object(self, **kwargs):
         return get_object_or_404(
@@ -45,10 +104,23 @@ class ProjectDetailView(SelectRelatedMixin, DetailView):
         )
 
 
-class ProjectList(ListView):
-    model = Project
-    context_object_name = "projects"
-    template_name = 'projects/all_projects.html'
+def ProjectList(request):
+    print("list")
+    projects  = Project.objects.all()
+    return render(request, "project/project_list.html", context={
+        'projects':projects
+    })
+    # model = Project
+    # context_object_name = "projects"
+    # template_name = 'project/project_list.html'
+
+    # def get_queryset(self):
+    #     self.projects = Project.objects.all()
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['projects'] = self.projects
+    #     return context
 
 
 class ProjectDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):

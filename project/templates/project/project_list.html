@@ -18,17 +18,17 @@
       <hr>
       <ul>
 
-        <li> <h4>Project:  {{project.name}}</h2></a> </li>
+        <li> <h4> <a href="{% url 'projects:project_detail' project_slug=project.project_slug %}">{{project.name}}</a> </h4></a> </li>
         <ul>
-          <li> <h6> Details : {{project.project_details}} </h3> </li>
+          <li> <h6>{{project.project_details}} </h6> </li>
 
           <ul>
-            {% for department in project.departments.all %}
-              <li>{{department}}</li>
+            {% if project.departments.count != 0 %}
+              <li> Deaprtment having this project: {{project.departments.count}}</li>
 
-            {% empty %}
-              <li>empty list!</li>
-            {% endfor %}
+            {% else %}
+              <li>No departments added!</li>
+            {% endif %}
           </ul>
         </ul>
 

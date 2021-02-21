@@ -71,6 +71,14 @@ def CreateDepartment(request):
                                                                 "department_slug":dept_slug}))
         else:
             print(departmentForm.errors, formset.errors)
+            departmentForm_errors = departmentForm.errors
+            formset_errors = formset.errors
+            return render(request, 'student/profileupdate_form.html', {
+                'department_form': DepartmentForm,
+                "formset":formset,
+                'departmentForm_errors': departmentForm_errors,
+                'formset_errors': formset_errors
+            })
     else:
         departmentForm = DepartmentForm()
         formset = ImageFormSet(queryset=DepartmentImages.objects.none())
