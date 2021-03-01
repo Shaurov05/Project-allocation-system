@@ -5,8 +5,6 @@ app_name = 'teachers'
 
 urlpatterns = [
     path('teacher/register/', views.teacher_register, name='teacher_register'),
-    path('teacher_login/', views.teacher_login, name='teacher_login'),
-    path('logout/', views.TeacherLogoutView , name="teacher_logout"),
 
     path('change/<teacher_slug>/password/', views.change_password, name='change_password' ),
 

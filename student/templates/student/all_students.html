@@ -17,7 +17,7 @@
 
 
       <hr>
-
+    <div style="height:400px;overflow:auto;">
       <table style="border: 1px solid black;" id="details_table" class="table table-bordered table-striped" align="center">
         <thead >
           <th> Profile Pic </th>
@@ -30,7 +30,7 @@
 
         {% for student in students %}
         <tr >
-          <td style="0px solid #0f1012"><br> </td>
+          <td style="border:0px"><br> </td>
         </tr>
 
         <tr style="border: 1px solid black;">
@@ -40,8 +40,8 @@
             <td><img src="/static/no_profile_pic.png"  height=120 width=120 alt=""></td>
           {% endif %}
 
-          <td> <a href="{% url 'students:student_detail' department_slug=student.department.department_slug student_slug=student.student_slug %} " style="color:#1bac91; font-size:19px"> {{student.user.username}}</a> </h4></td>
-          <td> {{ student.ID_Number }} </td>
+          <td style="min-width:200px;"> <a href="{% url 'students:student_detail' department_slug=student.department.department_slug student_slug=student.student_slug %} " style="color:#1bac91; font-size:19px"> {{student.user.username}}</a> </h4></td>
+          <td style="min-width:100px;"> {{ student.ID_Number }} </td>
 
           {% if student.user.email %}
             <td> <span style="color:#2f5b9c;"> {{student.user.email}}</span></td>
@@ -49,8 +49,8 @@
             <td> <span style="color:#2f5b9c;">Not given </span></td>
           {% endif %}
 
-          <td> <a href="{% url 'departments:department_detail' department_slug=student.department.department_slug %}"> {{ student.department.name }} </a> </td>
-          <td> <span style="color:#2f5b9c;">{{student.session}} </span> </td>
+          <td style="min-width:150px;"> <a href="{% url 'departments:department_detail' department_slug=student.department.department_slug %}"> {{ student.department.name }} </a> </td>
+          <td style="min-width:120px;"> <span style="color:#2f5b9c;">{{student.session}} </span> </td>
         </tr>
 
         <tr >
@@ -59,7 +59,7 @@
         </tr>
         {% endfor %}
       </table>
-
+    </div>
       <hr>
 
     </section>

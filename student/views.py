@@ -27,11 +27,6 @@ from .models import Student
 from teacher.models import Teacher
 from department.models import Department
 
-@login_required
-def StudentLogoutView(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('index'))
-
 
 def student_register(request):
     registered = False
@@ -78,8 +73,8 @@ def student_register(request):
         else:
             print(student_form.errors, student_profile_form.errors)
             return render(request, 'student/student_registration.html', {
-                'user_form': student_form,
-                'profile_form': student_profile_form,
+                'student_form': student_form,
+                'student_profile_form': student_profile_form,
                 'user_form_errors': student_form.errors,
                 'student_profile_form_errors': student_profile_form.errors
             })
@@ -91,28 +86,6 @@ def student_register(request):
                     'student_form':student_form,
                     'student_profile_form':student_profile_form,
                     'registered':registered})
-
-
-def student_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        # Django's built-in authentication function:
-        user = authenticate(username=username, password=password)
-
-        if user:
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect(reverse('index'))
-            else:
-                # If account is not active:
-                return HttpResponse("Your account is not active.")
-
-        else :
-            print('Invalid Username: {} and password: {} is provided'.format(username, password))
-            return HttpResponse("Invalid username or password supplied!")
-    else:
-        return render(request, 'student/login.html',{})
 
 
 @login_required
@@ -145,6 +118,30 @@ class StudentDetailView(SelectRelatedMixin, DetailView):
             Student,
             student_slug=self.kwargs['student_slug']
         )
+
+
+from project.models import *
+def student_detail_view(request, student_slug, department_slug):
+    student_detail = get_object_or_404(
+            Student,
+            student_slug=student_slug
+        )
+    assigned_project = student_detail.assigned_project_name
+    try:
+        project = Project.objects.get(name=student_detail.assigned_project_name)
+        projectChoice = ProjectChoice.objects.filter(student_id=student_detail.id)
+    except:
+        project = ""
+        projectChoice = ""
+
+    return render(request, 'student/student_detail.html', context={
+        'student_detail': student_detail,
+        'assigned_project': assigned_project,
+        'project':project,
+        'projectChoice':projectChoice,
+        'department_slug':department_slug,
+        'student_slug':student_slug
+    })
 
 
 class StudentList(SelectRelatedMixin, ListView):
@@ -273,8 +270,156 @@ class StudentDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
                                     'department_slug': dept_slug,})
 
 
-
 class all_students(ListView):
     model = Student
     context_object_name = 'students'
     template_name = 'student/all_students.html'
+
+
+@login_required
+@transaction.atomic
+def distributeProjects(request, student_slug):
+    student = Student.objects.get(student_slug=student_slug)
+    projects = Project.objects.filter(departments__in=[student.department])
+
+    try:
+        if request.user.is_superuser or request.user.teacher==student.supervisor or request.user.id==student.user.id:
+            if request.method == 'GET':
+                print(projects)
+
+                return render(request, 'student/project_choice.html', context={
+                    'projects': projects,
+                    'student': student,
+                    'Choices': ""
+                })
+
+    except Exception as ex:
+        print(ex)
+        return HttpResponse("You are not authorized to make changes!")
+
+
+@login_required
+@transaction.atomic
+def editDistributedProjects(request, student_slug):
+    student = Student.objects.get(student_slug=student_slug)
+    projects = Project.objects.filter(departments__in=[student.department])
+
+    projectChoices = ProjectChoice.objects.values('project_id').filter(student_id=student.id).order_by('id')
+    projectChoices = [value['project_id'] for value in projectChoices]
+
+    try:
+        if request.user.is_superuser or request.user.teacher==student.supervisor or request.user.id==student.user.id:
+            if request.method == 'GET':
+                print(projects)
+                # print(projectChoices)
+
+                return render(request, 'student/edit_project_choice.html', context={
+                    'projects': projects,
+                    'student':student,
+                    'Choices':projectChoices
+                })
+    except Exception as ex:
+        print(ex)
+        return HttpResponse("You are not authorized to make changes!")
+
+
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+@transaction.atomic
+def getSelectedList(request):
+    data = json.loads(request.body)
+    selected_projects = data['selected_options']
+    student_slug = data['student_slug']
+    print("selected ", selected_projects)
+    print("student_slug ", student_slug)
+
+    student = Student.objects.get(student_slug=student_slug)
+    # projects = Project.objects.filter(available=True)
+
+    if len(selected_projects) != 3:
+        return JsonResponse('You must select 3 projects!', safe=False)
+
+    assigned = False
+    rank = 1
+    try:
+        try:
+            project_instance = Project.objects.get(id=student.assigned_project_id)
+            print('project, ', project_instance)
+            project_instance.taken -= 1
+            project_instance.available = True
+            project_instance.save()
+
+            ProjectChoice.objects.filter(student_id=student.id).delete()
+        except Exception as ex:
+            print(ex)
+
+        for project in selected_projects:
+            object = Project.objects.get(id=project)
+
+            if object.available and not assigned:
+                student.assigned_project_id = object.id
+                student.assigned_project_name = object.name
+                assigned = True
+
+                # saving project and student model
+                object.taken += 1
+                object.save()
+                student.save()
+
+                if object.taken == object.can_be_taken_by:
+                    object.available = False
+                    object.save()
+
+            ProjectChoice.objects.create(
+                project_id=project,
+                student_id=student.id,
+                rank=rank,
+            )
+            rank+=1
+
+        if assigned==False:
+            return JsonResponse('Could not assign projects! Please select again. ', safe=False)
+
+        return JsonResponse('successful', safe=False)
+
+    except Exception as ex:
+        print(ex)
+        import sys
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(ex).__name__, ex)
+        return JsonResponse(str(ex), safe=False)
+
+
+def genereteList(request):
+    students = Student.objects.all()
+    context = {}
+    student_projects = []
+
+    for student in students:
+        try:
+            project = Project.objects.get(pk=student.assigned_project_id)
+            # print(project.departments.all()[0].name)
+            context = {
+                'student': student,
+                'project': project,
+                'divisions': project.departments.all()
+            }
+        except Exception as ex:
+            print(ex)
+            context = {
+                'student': student,
+                'project': "",
+                'divisions': ""
+            }
+
+        student_projects.append(context)
+
+    return render(request, 'student/distributed_list.html', context={
+        "student_projects":student_projects
+    })
+
+
+
+
+

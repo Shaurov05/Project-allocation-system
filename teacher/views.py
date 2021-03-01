@@ -27,11 +27,6 @@ from .forms import TeacherForm, TeacherProfileInfoForm
 from .models import Teacher
 from department.models import Department
 
-@login_required
-def TeacherLogoutView(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('index'))
-
 
 def teacher_register(request):
     registered = False
@@ -94,28 +89,6 @@ def teacher_register(request):
                     'teacher_form':teacher_form,
                     'teacher_profile_form':teacher_profile_form,
                     'registered':registered})
-
-
-def teacher_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        # Django's built-in authentication function:
-        user = authenticate(username=username, password=password)
-
-        if user:
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect(reverse('index'))
-            else:
-                # If account is not active:
-                return HttpResponse("Your account is not active.")
-
-        else :
-            print('Invalid Username: {} and password: {} is provided'.format(username, password))
-            return HttpResponse("Invalid username or password supplied!")
-    else:
-        return render(request, 'teachers/login.html',{})
 
 
 @login_required
@@ -229,7 +202,6 @@ class TeacherDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
           user.delete()
           return reverse_lazy('departments:department_teachers', kwargs={
                                     'department_slug': dept_slug, })
-
 
 
 class AllTeachers(ListView):

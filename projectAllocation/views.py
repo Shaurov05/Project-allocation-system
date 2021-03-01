@@ -60,8 +60,6 @@ def user_logout(request):
     return HttpResponseRedirect(reverse('thanks'))
 
 
-
-
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -76,12 +74,8 @@ def user_login(request):
             else:
                 return HttpResponse("Your account is not active.")
         else:
-            user = get_object_or_404(
-                        User,
-                        username=username
-                    )
-            print('Someone tried to login and failed. user: {} pass: {}'.format(user.username, user.password))
-            print('He used username: {} and password : {}'.format(username,password))
+            print('Someone tried to login and failed')
+            print('He used username: {} and password : {}'.format(username, password))
             # return HttpResponse("Invalid login details supplied!")
             messages.success(request, "Invalid login details supplied!")
             return render(request, 'user_login.html')

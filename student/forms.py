@@ -62,4 +62,4 @@ class StudentForm(forms.ModelForm):
 class StudentProfileInfoForm(forms.ModelForm):
     class Meta():
         model = Student
-        fields = ('ID_Number', 'session', 'department', 'profile_pic')
+        fields = ('ID_Number', 'supervisor', 'session', 'department', 'profile_pic')
