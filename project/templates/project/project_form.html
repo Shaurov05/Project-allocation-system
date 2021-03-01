@@ -27,7 +27,7 @@
   </div>
 
 
-    {% if user.is_superuser %}
+    {% if user.is_superuser or user.teacher %}
     <form id="project_form" method="post" action="" enctype="multipart/form-data">
 
       {% csrf_token %}
