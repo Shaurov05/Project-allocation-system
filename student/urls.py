@@ -10,8 +10,6 @@ urlpatterns = [
     path('selected/option/', views.getSelectedList, name='selected_option'),
     path('distribute/project/', views.genereteList, name='distributed_project_list'),
 
-    path('change/<int:pk>/password/', views.change_password, name='change_password' ),
-
     path('<department_slug>/<student_slug>/profile/', views.student_detail_view, name='student_detail'),
     path('department/<department_slug>/students', views.StudentList.as_view(), name='student_list'),
     path('update/profile/student/<student_slug>/', views.update_student_profile, name='update_student_profile'),

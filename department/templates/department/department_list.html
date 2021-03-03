@@ -6,10 +6,10 @@
 <section id="steps" class="steps section-bg">
   <div class="container jumbotron">
     {% if department_list.count == 0 %}
-      <h4>No departments created till now. This site is under construction.</h4>
+      <h4>No Divisions created till now. This site is under construction.</h4>
     {% else %}
-      <h4>Welcome to All department page of UIC</h4>
-      <h5>Number of departments : {{department_list.count}}</h5>
+      <h4>Welcome to All Division page of UIC</h4>
+      <h5>Number of Divisions : {{department_list.count}}</h5>
   </div>
 
   <div class="container">
@@ -18,7 +18,7 @@
       <hr>
       <ul>
 
-        <li> <h4>Department: <a href="{% url 'departments:department_detail'  department_slug=department.department_slug %}"> {{department.name}}</h2></a> </li>
+        <li> <h4>Division: <a href="{% url 'departments:department_detail'  department_slug=department.department_slug %}"> {{department.name}}</h2></a> </li>
         <ul>
           <li> <h6> Chairman : {{department.chairman}} </h3> </li>
           <li><h6>Total teachers in {{department.name}} : {{department.teachers.count}} </h2></li>

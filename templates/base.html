@@ -136,18 +136,13 @@
               <a class="nav-link" href='{% url "index" %}'>Home</a>
             </li>
 
-
-            <li class="nav-item">
-              <a class="nav-link" href="/#about">About</a>
-            </li>
-
             <li class="nav-item dropdown dropdown2">
               <a class="nav-link dropdown-toggle " href="/#departments" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Department
+                Division
               </a>
               <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
-                <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Department</a>
-                <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Departments</a>
+                <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Division</a>
+                <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Division</a>
               </div>
             </li>
 

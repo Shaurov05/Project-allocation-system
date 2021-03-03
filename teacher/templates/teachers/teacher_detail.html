@@ -55,7 +55,7 @@
         </tr>
 
         <tr>
-          <td> <p>Department:  </td>
+          <td> <p>Division:  </td>
           <td><span style="color:#2f5b9c;"><a href="{% url 'departments:department_detail' department_slug=teacher_detail.department.department_slug %}">{{teacher_detail.department}}</a>  </td>
         </tr>
 
@@ -76,7 +76,7 @@
 </section>
 
 
-{% if user.is_authenticated and user.username == teacher_detail.user.username %}
+{% if user.is_authenticated and user.username == teacher_detail.user.username or user.is_superuser %}
 <br><br>
 <div class="container">
   <a class='btn btn-warning' href="{% url 'teachers:update_teacher_profile' teacher_slug=teacher_detail.teacher_slug %}">
