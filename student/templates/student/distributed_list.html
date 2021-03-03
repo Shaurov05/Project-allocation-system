@@ -1,0 +1,126 @@
+{% extends "department/department_base.html" %}
+
+{% block content %}
+
+  <div class="container jumbotron">
+
+    <h3>Students are assigned project based on the availability and order of selection</h3>
+    <h6>Total students in UIT: <span style="font-size:22px;">{{ student_projects|length }}</span> </h6>
+    <br>
+
+  </div>
+
+{% if student_projects %}
+  <div class="container table-responsive">
+    <section id="steps" class="steps section-bg" style="background-color:#fafcff">
+
+
+      <hr>
+    <div style="height:600px;overflow:auto;">
+      <table style="border: 1px solid black; text-align:center;"  id="details_table" class="table table-bordered " align="center">
+        <thead >
+          <th> Student Username </th>
+          <th> Student ID </th>
+          <th> Email </th>
+          <th> Division </th>
+          <th> Session  </th>
+          <th> Supervisor Name </th>
+          <th> Assigned Project Title (Must be filled)</th>
+          <th style="width:300px;"> Aim (MUST be Filled: SMART)</th>
+          <th style="width:300px;"> Equipment/software Required</th>
+          <th style="width:400px;"> Lab/  Room (Have you spoken to the relevant technician)</th>
+          <th> Cohort </th>
+        </thead>
+
+        {% for object in student_projects %}
+
+
+        <tr style="border: 1px solid black;">
+
+          <td> <a href="{% url 'students:student_detail' department_slug=object.student.department.department_slug student_slug=object.student.student_slug %} " style="color:#1bac91; font-size:19px"> {{ object.student.user.username}}</a> </h4></td>
+          <td style="min-width:130px;"> {{ object.student.ID_Number }} </td>
+
+          {% if object.student.user.email %}
+            <td> <span style="color:#2f5b9c;"> {{object.student.user.email}}</span></td>
+          {% else %}
+            <td> <span style="color:#2f5b9c;">Not given </span></td>
+          {% endif %}
+
+          <td style="min-width:150px;"> <a href="{% url 'departments:department_detail' department_slug=object.student.department.department_slug %}"> {{ object.student.department.name }} </a> </td>
+          <td style="min-width:100px;"> <span style="color:#2f5b9c;">{{object.student.session}} </span> </td>
+          <td style="min-width:150px;"> <span style="color:#2f5b9c;">{{object.student.supervisor.user.username}} </span> </td>
+
+          {% if object.project.name %}
+          <td style="min-width:200px;"> <span style="color:#2f5b9c;">{{object.project.name}} </span> </td>
+          {% else %}
+          <td style="min-width:200px; text-align:left;"> <span style="color:red; "> Isn't assigned with any projects.
+            <a class='btn btn-primary' href="{% url 'students:project_choice' student_slug=object.student.student_slug %}">
+            <span class="fa fa-times-circle-ok"></span> Choose Project</a>
+          </span> </td>
+          {% endif %}
+
+          {% if object.project.project_details %}
+          <td style="min-width:400px; text-align:justify;"> <span style="color:#2f5b9c; ">{{object.project.project_details}} </span> </td>
+          {% else %}
+          <td style="min-width:400px;"> <span style="color:#2f5b9c; "> None </span> </td>
+          {% endif %}
+
+          {% if object.project.software_required %}
+          <td style="min-width:400px; text-align:justify;"> <span style="color:#2f5b9c; ">{{object.project.software_required}} </span> </td>
+          {% else %}
+          <td style="min-width:400px;"> <span style="color:#2f5b9c; "> None </span> </td>
+          {% endif %}
+
+          {% if object.project.lab %}
+          <td style="min-width:400px; text-align:justify;"> <span style="color:#2f5b9c; ">{{object.project.lab}} </span> </td>
+          {% else %}
+          <td style="min-width:400px;"> <span style="color:#2f5b9c; "> None </span> </td>
+          {% endif %}
+
+            {% if object.divisions %}
+          <td>
+            {% for department in object.divisions %}
+            <h6 style="color:#2f5b9c;"> {{ forloop.counter }}. {{ department.name }} </h6>
+            <br>
+            {% endfor %}
+          </td>
+            {% else %}
+          <td style="min-width:400px;"> <span style="color:#2f5b9c; "> None </span> </td>
+            {% endif %}
+        </tr>
+
+        {% endfor %}
+      </table>
+    </div>
+
+      <hr>
+
+    </section>
+    <br>
+    <button id="btnExport" class="btn btn-primary">
+        Download .xls file
+    </button>
+  </div>
+
+<br><br><br>
+{% endif %}
+
+<script>
+
+$(document).ready(function(){
+    $("#btnExport").click(function() {
+    console.log("working")
+        let table = document.getElementsByTagName("table");
+        TableToExcel.convert(table[0], { // html code may contain multiple tables so here we are refering to 1st table tag
+           name: `Distribued-list.xlsx`, // fileName you could use any name
+           sheet: {
+              name: 'Sheet 1' // sheetName
+           }
+        });
+    });
+});
+
+  console.log("working")
+</script>
+
+{% endblock %}

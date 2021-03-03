@@ -6,19 +6,35 @@
     <section id="steps" class="steps section-bg">
 
       <div class="container">
-        <h3>Update <span style="color:#1bac91; font-size:22px">{{ department.name }}</span> </h1>
+        <h3>Update <span style="color:#1bac91; font-size:22px">{{ project.name }}</span> </h3>
           <br>
         <form method="POST" class="post-form">
         {% csrf_token %}
 
         {% bootstrap_form form %}
 
+      <h6>Choose Divisions</h6>
+      <select name="departments" class="selectpicker department"
+              multiple title="Choose one of the following..."
+              data-live-search="true"
+              data-max-options="3"
+              data-actions-box="true">
+        {% for department in departments %}
+          <option value={{department.id}}> {{department.name}}</option>
+        {% endfor %}
+      </select>
 
-        <input type="submit" class="btn btn-primary"></input>
 
+      <br><br><br><br>
+      <input type="submit" name="submit" value="Edit Project" />
+      <br><br><br><br>
         </form>
       </div>
     </section>
 
+<script>
+
+$('.selectpicker').selectpicker('val', {{ choosen_depts_id }});
+</script>
 
 {% endblock %}

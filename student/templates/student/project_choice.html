@@ -1,0 +1,194 @@
+{% extends "department/department_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+    <div card-body>
+    {% if form_errors  %}
+    <h5 style="color:red;">{{ form_errors }}</h5>
+  {% endif %}
+
+  </div>
+
+    <form id="project_form" method="post" action="" enctype="multipart/form-data">
+
+      {% csrf_token %}
+      <h1>Choose your Project</h1>
+
+
+      <h6>Project will be distributed based on the order of your choice.
+        Choose Projects based on your choice of ranking. For example, choose Project A first
+      if you want to rank this project as your first choice, then choose Project B
+      as your second choice and so, select third project.</h6>
+
+    <div class="row">
+      <div class="col-lg-9" style="height:250px;">
+        <select name="projectChoices" class="selectpicker" id="myPicker2"
+              multiple title="Choose one of the following..."
+              data-live-search="true"
+              data-selected-text-format="count > 2"
+              data-max-options="3"
+              data-size="3"
+              data-style="btn-info">
+        {% for project in projects %}
+          {% if project.available == True %}
+            <option id="{{project.id}}" value={{project.id}}> {{project.name}}</option>
+          {% else %}
+            <option data-subtext="Not available" disabled value={{project.id}}> {{project.name}}</option>
+          {% endif %}
+
+        {% endfor %}
+      </select>
+      </div>
+
+      <div id="selectedOption" class="col-lg-3 " style="outline: 2px solid red; color:#8c4222">
+        <H5>Your selected projects are (based on your order of choice):</H5>
+
+      </div>
+
+    </div>
+
+
+
+      <br><br>
+      <input id="submit" type="submit" name="submit" value="Choose Projects" />
+      <br><br><br><br>
+    </form>
+
+  </div>
+</section>
+
+<br><br>
+
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+var myChoices = new Array();
+var myChoicesText = new Array();
+console.log("myChoices ",myChoices)
+
+$('.selectpicker').selectpicker('val', myChoices);
+
+var list = $("#selectedOption").append('<ul></ul>').find('ul');
+list.append('<li>' + ("None") + '</li>');
+
+function insertChoiceText(){
+  list.empty()
+
+  for (var i=0; i<myChoices.length ; i++){
+      console.log(myChoices[i])
+      var selected_option = document.getElementById(myChoices[i]).text
+      myChoicesText.push(selected_option)
+
+      list.append('<li>' + selected_option + '</li>');
+  }
+
+  if (selected_option==null){
+    list.append('<li>' + ("None") + '</li>');
+  }
+  console.log("myChoicesText ", myChoicesText)
+}
+
+
+$('#myPicker2').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+  var selected = document.getElementById("myPicker2").options[clickedIndex].value;
+  console.log("selected ", myChoices.indexOf((parseInt(selected))))
+
+  if (myChoices.indexOf(parseInt(selected)) == -1) {
+    console.log("if ", selected)
+    myChoices.push(parseInt(selected));
+  }
+  else {
+    console.log("else")
+    myChoices.splice(myChoices.indexOf(parseInt(selected)), 1);
+  }
+  console.log("myChoices ", myChoices);
+
+  var selected2 = document.getElementById("myPicker2").options[clickedIndex].text;
+  console.log("selected2 ", myChoices.indexOf(((selected2))))
+  if (myChoicesText.indexOf(selected2) == -1) {
+    myChoicesText.push(selected2);
+  } else {
+    myChoicesText.splice(myChoicesText.indexOf(selected2), 1);
+  }
+
+  insertChoiceText()
+  console.log("myChoicesText ", myChoicesText);
+
+});
+
+
+
+
+var url = '/selected/option/'
+var form = document.getElementById('project_form')
+
+let csrftoken = getCookie('csrftoken');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+  })
+
+$('#submit').click(function(event){
+  console.log("csrf ", csrftoken)
+  submitFormData()
+  })
+
+ var slug = "{{ student.student_slug }}";
+ function submitFormData(){
+ let data = {'selected_options': myChoices,
+              'student_slug': slug }
+ console.log("data", data)
+
+    fetch("{% url 'students:selected_option' %}", {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+        "Access-Control-Allow-Origin" : "*",
+        "Access-Control-Allow-Credentials" : true
+      },
+      body:JSON.stringify(data),
+    })
+    .then((response) => response.json())
+
+    .then((data) =>{
+      if (data != "successful"){
+        alert(data)
+      } else{
+        console.log('success ', data);
+        setTimeout(StudentDetail, 1000)
+      }
+    })
+    }
+
+  function StudentDetail(){
+      window.location.href = "{% url 'students:student_detail' department_slug=student.department.department_slug student_slug=student.student_slug %}";
+  }
+
+
+</script>
+
+{% endblock %}
+
+
+

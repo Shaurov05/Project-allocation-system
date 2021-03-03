@@ -12,17 +12,17 @@
     </ul>
     <br>
 
-    {% if user.is_superuser %}
+    {% if user.is_superuser or user.teacher %}
     <ul>
       <div class="row">
         <div class="col-lg-3 col-md-3">
-          <a class="btn btn-lg btn-primary" href="#">
+          <a class="btn btn-lg btn-primary" href="{% url 'projects:update_project' project_slug=project_details.project_slug %}">
             <span class="fa fa-times-circle-ok"></span> Update Project
           </a>
         </div>
 
       <div class="col-lg-3 col-md-3">
-        <a class="btn btn-lg btn-danger" href="#">
+        <a class="btn btn-lg btn-danger" href="{% url 'projects:delete_project' project_slug=project_details.project_slug %}">
           <span class="fa fa-times-circle-o"></span> Delete Project
         </a>
       </div>
@@ -46,7 +46,7 @@
 <section id="portfolio" class=" section-bg">
 
     <div class="container">
-      <h4>Departments: </h4>
+      <h4>Divisions: </h4>
       <div class="row ">
 
         {% if project_details.departments.count != 0 %}
@@ -61,7 +61,7 @@
         </ul>
 
       {% else %}
-      <h5>No departments added in <span style="color:#1bac91;">{{project_details.name}}</span>. This site is under
+      <h5>No Divisions added in <span style="color:#1bac91;">{{project_details.name}}</span>. This site is under
         maintenance.</h2>
       {% endif %}
     </div>

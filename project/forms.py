@@ -9,7 +9,8 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         # fields = ['name', 'date', 'members']
-        fields = ['name', 'project_details']
+        fields = ['name', 'project_details', 'can_be_taken_by',
+                  'software_required', 'lab']
 
     # departments = forms.ModelMultipleChoiceField(
     #     queryset=Department.objects.all(),

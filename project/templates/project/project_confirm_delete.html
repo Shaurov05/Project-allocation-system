@@ -9,7 +9,7 @@
 			{% csrf_token %}
 
 			<input type="submit" value="Confirm Delete" class="btn btn-danger btn-large">
-			<a href="{% url 'departments:department_detail' department_slug=department.department_slug %}" class="btn btn-primary btn-large">Cancel</a>
+			<a href="{% url 'projects:project_detail' project_slug=object.project_slug %}" class="btn btn-primary btn-large">Cancel</a>
 
 		</form>
 	</div>

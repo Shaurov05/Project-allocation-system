@@ -39,7 +39,7 @@
     <form id="department_form" method="post" action="" enctype="multipart/form-data">
 
       {% csrf_token %}
-      <h1>Create New Department</h1>
+      <h1>Create New Division</h1>
 
       {% for hidden in department_form.hidden_fields %}
           {{ hidden }}<br>
@@ -64,10 +64,10 @@
       {% endfor %}
 
       <br>
-      <input type="submit" name="submit" value="Create Department" />
+      <input type="submit" name="submit" value="Create Division" />
     </form>
     {% else %}
-    <h2>You must be a superuser to Create Department</h2>
+    <h2>You must be a superuser to Create Division</h2>
     {% endif %}
   </div>
 </section>

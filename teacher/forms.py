@@ -38,3 +38,8 @@ class TeacherProfileInfoForm(forms.ModelForm):
     class Meta():
         model = Teacher
         fields = ('ID_Number', 'department', 'academic_rank', 'portfolio_site', 'profile_pic')
+
+    def __init__(self, *args, **kwargs):
+        super(TeacherProfileInfoForm, self).__init__(*args, **kwargs)
+        self.fields['department'].label = "Division"
+

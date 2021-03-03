@@ -41,15 +41,19 @@
   <link href='{% static "assets/css/style.css" %}' rel="stylesheet">
 <!--  <link href='{% static "css/main.css" %}' rel="stylesheet">-->
 
-
-<!--  contains multiple select picker-->
+  <!--  contains multiple select picker-->
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-  <!-- (Optional) Latest compiled and minified JavaScript translation files -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/i18n/defaults-*.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
+
+
+
+
+<!--  export excel file-->
+  <script src="https://cdn.jsdelivr.net/gh/linways/table-to-excel@v1.0.4/dist/tableToExcel.js"></script>
 
 </head>
 
@@ -132,18 +136,13 @@
               <a class="nav-link" href='{% url "index" %}'>Home</a>
             </li>
 
-
-            <li class="nav-item">
-              <a class="nav-link" href="/#about">About</a>
-            </li>
-
             <li class="nav-item dropdown dropdown2">
               <a class="nav-link dropdown-toggle " href="/#departments" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Department
+                Division
               </a>
               <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
-                <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Department</a>
-                <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Departments</a>
+                <a class="dropdown-item" href="{% url 'departments:create_department' %}">Create Division</a>
+                <a class="dropdown-item" href="{% url 'departments:all_departments' %}">All Division</a>
               </div>
             </li>
 
@@ -154,6 +153,7 @@
               <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="{% url 'projects:create_project' %}">Create Project</a>
                 <a class="dropdown-item" href="{% url 'projects:project_list' %}">All Projects</a>
+                <a class="dropdown-item" href="{% url 'students:distributed_project_list' %}">Distributed Project List</a>
               </div>
             </li>
 
@@ -257,35 +257,16 @@
   <footer id="footer">
     <div class="footer-top">
       <div class="container">
-        <div class="row">
 
-          <div class="col-lg-5 col-md-5">
-            <div class="footer-info">
-              <h3>PAS</h3>
-              <p>
-                A108 Adam Street <br>
-                NY 535022, USA<br><br>
-                <strong>Phone:</strong> +1 5589 55488 55<br>
-                <strong>Email:</strong> info@example.com<br>
-              </p>
-
+            <div class="footer-info" style="text-align:center;">
+              <h3> &#169; PAS -
+              <span>
+                University Project allocation system <br>
+              </span>
+                </h3>
             </div>
-          </div>
-
-          <div class="col-lg-6 col-md-6 footer-links">
-            <h4>Useful Links</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="/#departments">Department</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="/#about">About us</a></li>
-              <!-- <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li> -->
-            </ul>
-          </div>
-
-
 
         </div>
-      </div>
     </div>
 
   </footer><!-- End Footer -->

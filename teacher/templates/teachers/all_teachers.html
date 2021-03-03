@@ -16,23 +16,22 @@
 
   <div >
     <section id="steps" class="container steps section-bg" style="background-color:#fafcff">
-
-
-      <table id="details_table" align="center">
+      <div style="height:400px;overflow:auto;">
+        <table id="details_table" class="table table-bordered " align="center">
         <thead style="color:blue">
           <th>Profile Pic </th>
           <th> Username  </th>
           <th> Academic Rank </th>
           <th> Teacher ID </th>
           <th> Email </th>
-          <th>Department </th>
+          <th>Division </th>
 
         </thead>
 
 
         {% for teacher in teachers %}
         <tr >
-          <td style="0px solid #0f1012"><br> </td>
+          <td style="border:0px solid #0f1012"><br> </td>
         </tr>
         
         <tr>
@@ -42,22 +41,22 @@
             <td><img src="/static/no_profile_pic.png"  height=150 width=150 alt=""></td>
           {% endif %}
 
-          <td> <a href="{% url 'teachers:teacher_detail' department_slug=teacher.department.department_slug teacher_slug=teacher.teacher_slug %} " style="color:#1bac91; font-size:19px"> {{teacher.user.username}}</a> </h4></td>
-          <td> {{teacher.academic_rank}} </td>
-          <td> {{ teacher.ID_Number }} </td>
+          <td style="min-width:150px;"> <a href="{% url 'teachers:teacher_detail' department_slug=teacher.department.department_slug teacher_slug=teacher.teacher_slug %} " style="color:#1bac91; font-size:19px"> {{teacher.user.username}}</a> </h4></td>
+          <td style="min-width:120px;"> {{teacher.academic_rank}} </td>
+          <td style="min-width:100px;"> {{ teacher.ID_Number }} </td>
 
           {% if teacher.user.email %}
-            <td> <span style="color:#2f5b9c;"> {{teacher.user.email}} </span></td>
+            <td style="min-width:150px;"> <span style="color:#2f5b9c;"> {{teacher.user.email}} </span></td>
           {% else %}
-            <td> <span style="color:#2f5b9c;">Not given </span></td>
+            <td style="min-width:150px;"> <span style="color:#2f5b9c;">Not given </span></td>
           {% endif %}
 
-          <td> <a href="{% url 'departments:department_detail' department_slug=teacher.department.department_slug %}"> {{ teacher.department.name }} </a> </td>
-          <td> <span style="color:#2f5b9c;">{{teacher.session}} </span> </td>
+          <td style="min-width:150px;"> <a href="{% url 'departments:department_detail' department_slug=teacher.department.department_slug %}"> {{ teacher.department.name }} </a> </td>
         </tr>
         
         {% endfor %}
       </table>
+      </div>
     </section>
   </div>
 

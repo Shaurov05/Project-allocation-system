@@ -23,134 +23,199 @@ from .forms import *
 from .models import *
 from department.models import Department
 
-
-class CreateProject(CreateView):
-    model = Project
-    form_class = ProjectForm
-    template_name = 'project/project_form.html'
-    success_url = reverse_lazy('index')
-
-
 from django.db import transaction
+
+
 @login_required
 @transaction.atomic
 def CreateNewProject(request):
+    # declaring a glocal variable
+    global instance
+    # gets all objects of department model
     departments = Department.objects.all()
     try:
-        if not request.user.is_superuser or not request.user.teachers:
-            return HttpResponse("You must be a superuser or Teacher to create a project")
+        # check if the user is superuser or the user is teacher
+        if request.user.is_superuser or request.user.teacher:
+            if request.method == 'GET':
+                form = ProjectForm()
+                print("create - get method")
+
+                return render(request, "project/project_form.html",
+                              context={'form': form,
+                                       'departments': departments,
+                                       })
+
+            elif request.method == 'POST':
+                # we get the information sent by the user using request.POST
+                project_form = ProjectForm(data=request.POST)
+
+                if project_form.is_valid():
+                    # if the information sent by the user is valid, then we save info to the database.
+                    instance = project_form.save()
+
+                    # check if user selects multiple projects or not
+                    try:
+                        # get the list of ids of departments
+                        selected_departments = request.POST.getlist("departments")
+                    except:
+                        # get a single id of department
+                        selected_departments = request.POST.get("departments")
+
+                    print(selected_departments)
+                    # print(instance.id)
+
+                    for department_id in selected_departments:
+                        try:
+                            # create DepartmentProject object for every if in selected_departments
+                            DepartmentProject.objects.create(project=instance,
+                                                             department_id=int(department_id))
+                        except Exception as ex:
+                            print("second exception: ", ex)
+                            # deleting the project
+                            # if any exception occurs, delete the project object
+                            project = Project.objects.get(id=instance.id)
+                            project.delete()
+                            messages.error(request, ('Check these errors'))
+                            return render(request, 'project/project_form.html', context={
+                                'form': ProjectForm(data=request.POST),
+                                'departments': departments,
+                                'formErrors': ex})
+                else:
+                    # if the form is not valid, it show the errors to the user
+                    messages.error(request, ('Check these errors'))
+                    return render(request, 'project/project_form.html', context={
+                        'form': ProjectForm(data=request.POST),
+                        'departments': departments,
+                        'formErrors': ProjectForm.errors})
+
+            print(instance.project_slug)
+            # if everything is okay, then redirect the user to the project details page.
+            return redirect(reverse('projects:project_detail',
+                                    kwargs={"project_slug": instance.project_slug}))
     except Exception as ex:
         print("first exception: ", ex)
-        if request.method == 'GET':
-            form = ProjectForm()
-            # students = Student.objects.all()
+        return HttpResponse("You must be a superuser or Teacher to create a project")
 
-            return render(request, "project/project_form.html",
-                          context={'form':form,
-                                   # 'students': students
-                                   'departments':departments,
-                                   })
 
-        elif request.method == 'POST':
-            project_form = ProjectForm(data=request.POST)
+@transaction.atomic
+def UpdateProject(request, project_slug):
+    global instance
+    # getting the project and all departments from the database
+    departments = Department.objects.all()
+    project = Project.objects.get(project_slug=project_slug)
+    # filtering departments under that particular project and getting ids of those departments.
+    choosen_depts = DepartmentProject.objects.filter(project_id=project.id)
+    choosen_depts_id = [dept.department.id for dept in choosen_depts]
 
-            if project_form.is_valid():
-                instance = project_form.save()
-                try:
-                    selected_departments = request.POST.getlist("departments")
-                except:
-                    selected_departments = request.POST.getlist("departments")
-                print(selected_departments)
-                # print(instance.id)
+    try:
+        if request.user.is_superuser or request.user.teacher:
+            if request.method == 'GET':
+                # getting the project form and passing the instance to get the previous data from the database
+                form = ProjectForm(instance=project)
+                print("create - get method")
 
-                for department_id in selected_departments:
+                return render(request, "project/project_update.html",
+                              context={'form': form,
+                                       'project':project,
+                                       'departments': departments,
+                                       "choosen_depts_id": choosen_depts_id,
+                                       })
+
+            elif request.method == 'POST':
+                print("post ")
+                # getting the values sent by the user
+                project_form = ProjectForm(data=request.POST, instance=project)
+
+                if project_form.is_valid():
+                    # after checking the form validation, we save the updates to the database
+                    instance = project_form.save()
+
                     try:
-                        DepartmentProject.objects.create(project=instance,
-                                                         department_id=int(department_id))
-                    except Exception as ex:
-                        print("second exception: ",ex)
-                        # deleting the project
-                        project = Project.objects.get(id=instance.id)
-                        project.delete()
-                        messages.error(request, ('Check these errors'))
-                        return render(request, 'project/project_form.html', context={
-                            'form': ProjectForm(data=request.POST),
-                            'departments': departments,
-                            'formErrors': ex})
-            else:
-                messages.error(request, ('Check these errors'))
-                return render(request, 'project/project_form.html', context={
-                    'form': ProjectForm(data=request.POST),
-                    'departments': departments,
-                    'formErrors': ProjectForm.errors})
+                        # getting the list of ids sent by the user
+                        selected_departments = request.POST.getlist("departments")
+                    except:
+                        # getting a single id sent by the user
+                        selected_departments = request.POST.get("departments")
+                    print("selected_departments ", selected_departments)
+                    # print(instance.id)
 
-        print(instance.project_slug)
-        return redirect(reverse('projects:project_detail',
-                            kwargs={"project_slug":instance.project_slug}))
+                    # getting the previous departments added under the particular project and
+                    # delete those before saving updates.
+                    DepartmentProject.objects.filter(project=instance).delete()
+                    for department_id in selected_departments:
+                        try:
+                            # creating new object/ saving departments under the particular project
+                            DepartmentProject.objects.create(project=instance,
+                                                             department_id=int(department_id))
+                        except Exception as ex:
+                            print("second exception: ", ex)
+
+                            # deleting the project
+                            # if exception occurs, delete the project
+                            project = Project.objects.get(id=instance.id)
+                            project.delete()
+
+                            messages.error(request, ('Check these errors'))
+                            return render(request, 'project/project_update.html', context={
+                                'form': ProjectForm(data=request.POST),
+                                'departments': departments,
+                                'formErrors': ex})
+                else:
+                    print("else part")
+                    # if the form is not valid, show the errors to the user
+                    messages.error(request, ('Check these errors'))
+                    return render(request, 'project/project_update.html', context={
+                        'form': ProjectForm(data=request.POST, instance=project),
+                        'departments': departments,
+                        'formErrors': ProjectForm.errors})
+
+                print("project_slug ", instance.project_slug)
+                return HttpResponseRedirect(reverse('projects:project_detail',
+                                        kwargs={"project_slug": instance.project_slug}))
+        else:
+            raise Exception
+    except Exception as ex:
+        print("first exception: ", ex)
+        return HttpResponse("You must be a superuser or Teacher to create a project")
 
 
-
-class ProjectDetailView(SelectRelatedMixin, DetailView):
-
+class ProjectDetailView(DetailView):
     model = Project
     context_object_name = 'project_details'
     template_name = 'project/project_detail.html'
 
     def get_object(self, **kwargs):
-        return get_object_or_404(
-            Project,
+        # gets the particular object from the database to show it to the user
+        print(self.kwargs)
+        project = Project.objects.get(
             project_slug=self.kwargs['project_slug']
-            # access_key=self.kwargs['access_key'],
         )
-
-
-def ProjectList(request):
-    print("list")
-    projects  = Project.objects.all()
-    return render(request, "project/project_list.html", context={
-        'projects':projects
-    })
-    # model = Project
-    # context_object_name = "projects"
-    # template_name = 'project/project_list.html'
-
-    # def get_queryset(self):
-    #     self.projects = Project.objects.all()
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['projects'] = self.projects
-    #     return context
-
-
-class ProjectDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
-    login_url = '/teacher/login/'
-    template_name = 'teachers/teacher_confirm_delete.html'
-    model = Project
-    # select_related = ("user", "department")
-
-    def get_object(self, **kwargs):
-        return Project.objects.get(project_slug=self.kwargs['project_slug'])
-
-    def get_success_url(self):
-          # if you are passing 'slug' from 'urls' to 'DeleteView' for teacher
-          # capture that 'slug' as dept_slug and pass it to 'reverse_lazy()' function
-          dept_slug = self.kwargs['department_slug']
-          teacher_slug = self.kwargs['teacher_slug']
-
-          teacher = self.get_object()
-          user = teacher.user
-          logout(self.request)
-          user.delete()
-          return reverse_lazy('departments:department_teachers', kwargs={
-                                    'department_slug': dept_slug, })
-
+        print(project)
+        return project
 
 
 class AllProjects(ListView):
-    model = Teacher
+    # ListView collects all projects from the database
+    model = Project
     context_object_name = "projects"
-    template_name = 'projects/all_projects.html'
+    template_name = 'project/project_list.html'
+
+
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = '/user/login/'
+    template_name = 'project/project_confirm_delete.html'
+    model = Project
+
+    # get the particular project to delete
+    def get_object(self, **kwargs):
+        return Project.objects.get(project_slug=self.kwargs['project_slug'])
+
+    # shows the list of projects page, after successfully deleting the project from the database
+    def get_success_url(self):
+          return reverse_lazy('projects:project_list')
+
+
+
 
 
 

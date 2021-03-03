@@ -6,6 +6,11 @@ from department.models import Department
 from student.models import Student
 from teacher.models import Teacher
 
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+from django.core.exceptions import PermissionDenied
+
+
 # Create your models here.
 from django.utils.text import slugify
 
@@ -18,6 +23,12 @@ class Project(models.Model):
     project_details = models.TextField()
     project_slug = models.SlugField(allow_unicode=True, unique=True)
     available = models.BooleanField(default=True)
+
+    software_required = models.TextField()
+    lab = models.CharField(max_length=300)
+
+    taken = models.IntegerField(default=0)
+    can_be_taken_by = models.IntegerField(default=5)
 
     created_by = models.ForeignKey(User, blank=True, null=True, related_name="project_created_by", on_delete=models.CASCADE)
     updated_by = models.ForeignKey(User, blank=True, null=True, related_name="project_updated_by", on_delete=models.CASCADE)
@@ -34,6 +45,11 @@ class Project(models.Model):
     def get_absolute_url(self):
         return reverse("projects:project_detail",
                         kwargs={"project_slug":self.project_slug})
+
+    @receiver(pre_delete, sender=User)
+    def delete_user(sender, instance, **kwargs):
+        if not instance.is_superuser and not instance.teachers:
+            raise PermissionDenied
 
 
 class ProjectChoice(models.Model):

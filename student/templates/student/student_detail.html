@@ -9,8 +9,9 @@
 <section id="portfolio" class="portfolio section-bg">
 
 <div class="container">
-  <div class="row portfolio-container" data-aos="fade-up">
-    <div class="col-lg-4 col-md-6 portfolio-item filter-faculty">
+  <div class="portfolio-container" data-aos="fade-up">
+    <div class="row">
+          <div class="col-lg-4 col-md-6 portfolio-item filter-faculty">
       <div class="portfolio-wrap">
             {% if student_detail.profile_pic %}
              <img class="img-fluid" src="{{ student_detail.profile_pic.url }}" alt="">
@@ -31,7 +32,7 @@
       </div>
     </div>
 
-    <div class="col-lg-8 col-md-6 portfolio-item filter-faculty">
+    <div class="col-lg-8 col-md-6 portfolio-item ">
       <table id="details_table_teacher">
         <tr>
           <td> <p>Student Username: </p> </td>
@@ -53,7 +54,7 @@
         </tr>
 
         <tr>
-          <td> <p>Department:  </td>
+          <td> <p>Division:  </td>
           <td><span style="color:#2f5b9c;"><a href="{% url 'departments:department_detail' department_slug=student_detail.department.department_slug %}">{{student_detail.department}} </a> </span> </td>
         </tr>
 
@@ -65,7 +66,33 @@
 
 
       </div>
+    </div>
 
+
+    <br> <br>
+      {% if assigned_project %}
+        <br><h5>Projects Choosen:</h5>
+
+        <ul>
+        {% for choice in projectChoice %}
+          <li> <a href="{% url 'projects:project_detail' project_slug=choice.project.project_slug %}"> {{ choice.project.name }} </a></li>
+        {% endfor %}
+        </ul>
+
+            <h3 style="color:#910c03; font-weight:bold; margin-left:20px; margin-right:10px;"> The project you have got is:
+         <span> <a href="{% url 'projects:project_detail' project_slug=project.project_slug %}">{{ assigned_project }} </a></span> </h3>
+
+
+        <br><br>
+        <a class='btn btn-primary' style="margin-left:20px;" href="{% url 'students:edit_project_choice' student_slug=student_detail.student_slug %}">
+         Edit Project Choice</a>
+
+      {% elif user.teacher or user == student_detail or user.is_superuser %}
+        <h4 style="margin-left:20px;">You haven't choose any projects</h4>
+
+        <a class='btn btn-primary' style="margin-left:20px;" href="{% url 'students:project_choice' student_slug=student_detail.student_slug %}">
+        <span class="fa fa-times-circle-ok"></span> Choose Project</a>
+      {% endif %}
 
     </div>
 
