@@ -138,6 +138,7 @@ def student_detail_view(request, student_slug, department_slug):
 
 
 class StudentList(SelectRelatedMixin, ListView):
+    # get all student object from database
     model = Student
     select_related = ("user", "department")
 
