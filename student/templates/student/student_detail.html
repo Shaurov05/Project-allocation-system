@@ -54,6 +54,11 @@
         </tr>
 
         <tr>
+          <td> <p>Supervisor:  </td>
+          <td><span style="color:#2f5b9c;"><a href="{% url 'teachers:teacher_detail' department_slug=student_detail.department.department_slug teacher_slug=student_detail.supervisor.teacher_slug %}">{{student_detail.supervisor}} </a> </span> </td>
+        </tr>
+
+        <tr>
           <td> <p>Division:  </td>
           <td><span style="color:#2f5b9c;"><a href="{% url 'departments:department_detail' department_slug=student_detail.department.department_slug %}">{{student_detail.department}} </a> </span> </td>
         </tr>
@@ -78,21 +83,33 @@
           <li> <a href="{% url 'projects:project_detail' project_slug=choice.project.project_slug %}"> {{ choice.project.name }} </a></li>
         {% endfor %}
         </ul>
-
             <h3 style="color:#910c03; font-weight:bold; margin-left:20px; margin-right:10px;"> The project you have got is:
          <span> <a href="{% url 'projects:project_detail' project_slug=project.project_slug %}">{{ assigned_project }} </a></span> </h3>
 
 
         <br><br>
-        <a class='btn btn-primary' style="margin-left:20px;" href="{% url 'students:edit_project_choice' student_slug=student_detail.student_slug %}">
-         Edit Project Choice</a>
+<!--        <a class='btn btn-primary' style="margin-left:20px;" href="{% url 'students:edit_project_choice' student_slug=student_detail.student_slug %}">-->
+<!--         Edit Project Choice</a>-->
 
-      {% elif user.teacher or user == student_detail or user.is_superuser %}
+      {% elif user.teacher or user == student_detail.user or user.is_superuser %}
         <h4 style="margin-left:20px;">You haven't choose any projects</h4>
 
         <a class='btn btn-primary' style="margin-left:20px;" href="{% url 'students:project_choice' student_slug=student_detail.student_slug %}">
         <span class="fa fa-times-circle-ok"></span> Choose Project</a>
       {% endif %}
+
+      <br><br>
+    <div style="border:2px solid gray; ">
+      {% if requested_project %}
+        <h4 style="margin:4px 4px 4px 4px;">Your requested proposal to the <a href="{% url 'teachers:teacher_detail' department_slug=student_detail.department.department_slug teacher_slug=student_detail.supervisor.teacher_slug %}">supervisor:</a>  </h4>
+        <ul>
+          <li> <span style="color:#910c03; font-weight:bold;">Title:</span> {{requested_project.name}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Details:</span> {{requested_project.details}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Software Required:</span> {{requested_project.software_required}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Lab:</span> {{requested_project.lab}} </li>
+        </ul>
+      {% endif %}
+    </div>
 
     </div>
 

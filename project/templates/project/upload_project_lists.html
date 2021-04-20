@@ -1,0 +1,44 @@
+{% extends "department/department_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+
+    {% if user.is_superuser or user.teacher %}
+    <form id="project_form" method="post" action="" enctype="multipart/form-data">
+
+      {% csrf_token %}
+      <h1>Upload Project excel file</h1>
+      <h5>Follow this column sequence in the excel file for creating new projects.</h5>
+      <ol>
+        <li>Name</li>
+        <li>Project Detail</li>
+        <li>Can be taken</li>
+        <li>Software Required</li>
+        <li>Lab</li>
+        <li>Divisions</li>
+      </ol>
+
+        <input type="file" name="projectLists" />
+
+      <br><br>
+      <input type="submit" name="submit" value="Upload excel file" />
+    </form>
+    {% else %}
+    <h2>You must be a superuser or teacher to Create Project</h2>
+    {% endif %}
+  </div>
+</section>
+
+<br><br>
+{% endblock %}
+
+
+
+<script>
+
+</script>
+

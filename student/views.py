@@ -127,13 +127,20 @@ def student_detail_view(request, student_slug, department_slug):
         project = ""
         projectChoice = ""
 
+    try:
+        requested_project = ProjectRequestProposal.objects.get(created_by=student_detail.id)
+    except:
+        requested_project = ""
+
+    # print("requested_project : ", requested_project)
     return render(request, 'student/student_detail.html', context={
         'student_detail': student_detail,
         'assigned_project': assigned_project,
         'project':project,
         'projectChoice':projectChoice,
         'department_slug':department_slug,
-        'student_slug':student_slug
+        'student_slug':student_slug,
+        'requested_project':requested_project,
     })
 
 
@@ -282,6 +289,17 @@ class all_students(ListView):
     template_name = 'student/all_students.html'
 
 
+def check_authority(request, student):
+    if request.user.is_superuser:
+        return True
+    elif request.user.id == student.user.id:
+        return True
+    elif request.user.teacher == student.supervisor:
+        return True
+    else:
+        return False
+
+
 @login_required
 @transaction.atomic
 def distributeProjects(request, student_slug):
@@ -291,16 +309,14 @@ def distributeProjects(request, student_slug):
     try:
         # check if the user is admin or the teacher or the student himself
         # if the user is among them, then we let the user to choose project
-        if request.user.is_superuser or request.user.teacher==student.supervisor or request.user.id==student.user.id:
+        if check_authority(request=request, student=student):
             if request.method == 'GET':
                 print(projects)
-
                 return render(request, 'student/project_choice.html', context={
                     'projects': projects,
                     'student': student,
                     'Choices': ""
                 })
-
     except Exception as ex:
         print(ex)
         return HttpResponse("You are not authorized to make changes!")
@@ -320,7 +336,7 @@ def editDistributedProjects(request, student_slug):
     try:
         # check if the user is admin or the teacher or the student himself
         # if the user is among them, then we let the user to edit project choices
-        if request.user.is_superuser or request.user.teacher==student.supervisor or request.user.id==student.user.id:
+        if check_authority(request=request, student=student):
             if request.method == 'GET':
                 print(projects)
                 # print(projectChoices)
@@ -353,8 +369,8 @@ def getSelectedList(request):
     # projects = Project.objects.filter(available=True)
 
     # checking if the user has choosen 3 projects or not.
-    if len(selected_projects) != 3:
-        return JsonResponse('You must select 3 projects!', safe=False)
+    # if len(selected_projects) != 3:
+    #     return JsonResponse('You must select 3 projects!', safe=False)
 
     assigned = False
     rank = 1
