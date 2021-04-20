@@ -30,6 +30,7 @@ class ErrorTemplateView(TemplateView):
 class RegistrationOptionsPage(TemplateView):
     template_name = 'registration_options.html'
 
+
 class LogoutPage(TemplateView):
     template_name = 'thanks.html'
 

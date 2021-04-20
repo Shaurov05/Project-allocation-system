@@ -1,0 +1,32 @@
+{% extends "department/department_base.html" %}
+
+{% block content %}
+
+
+<section id="steps" class="steps section-bg">
+
+{% if requested_projects %}
+  <div class="container">
+    {% for requested_project in requested_projects %}
+      <hr>
+      <ul>
+          <li> <span style="color:#910c03; font-weight:bold;">Title:</span> {{requested_project.name}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Details:</span> {{requested_project.details}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Software Required:</span> {{requested_project.software_required}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Lab:</span> {{requested_project.lab}} </li>
+          <li> <span style="color:#910c03; font-weight:bold;">Requested by:</span> <a href="{% url 'students:student_detail' department_slug=requested_project.created_by.department.department_slug student_slug=requested_project.created_by.student_slug %}"> {{requested_project.created_by}} </a> </li>
+      </ul><hr>
+    {% endfor %}
+  </div>
+
+{% else %}
+    <div style="text-align:center; ">
+         <h5> <span style="color:#910c03; font-weight:bold;"> You don't have any requested projects from any students. </span></h5>
+    </div>
+
+{% endif %}
+
+</section>
+
+
+{% endblock %}

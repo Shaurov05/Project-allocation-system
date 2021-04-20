@@ -73,4 +73,12 @@ class DepartmentProject(models.Model):
         return self.project.name
 
 
+class ProjectRequestProposal(models.Model):
+    name = models.CharField(max_length=256)
+    details = models.TextField()
+    software_required = models.CharField(max_length=256)
+    lab = models.CharField(max_length=300)
+    supervisor = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(Student, on_delete=models.CASCADE)
+
 

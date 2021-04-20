@@ -1,0 +1,49 @@
+{% extends "department/department_base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+<section id="steps" class="steps section-bg">
+  <div class="container jumbotron">
+     <div class="container card border border-danger" style="background-color:#e0dada; width: 50rem; color:#8c000c">
+    <div card-body>
+      {% if formErrors %}
+      <h4>Validation Error</h4>
+      <h6>Check these fileds:</h6>
+    {% endif %}
+
+    {% if formErrors %}
+      <ul>
+        {% for error in formErrors %}
+        <li>
+          {{ error }}
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    </div>
+  </div>
+
+    {% if user.student or user.is_superuser %}
+    <form id="project_form" method="post" action="" enctype="multipart/form-data">
+
+      {% csrf_token %}
+      <h1>Request your project idea to your supervisor</h1>
+
+      {% bootstrap_form form %}
+
+      <br><br>
+      <input type="submit" name="submit" value="Request to supervisor" />
+    </form>
+    {% else %}
+    <h2>You must be a student to request your supervisor for a project</h2>
+    {% endif %}
+  </div>
+</section>
+
+<br><br>
+{% endblock %}
+
+
