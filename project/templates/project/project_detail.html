@@ -34,8 +34,13 @@
 <div class="container">
   <h4>Name of the Project: <span style="color:#1bac91; font-size:19px">{{project_details.name}}</span> </h4>
   <ul>
-    <h5 style="color:#8a5030 ;"><strong>About {{department.name}}: </strong> </h5>
-    <li>{{ project_details.project_details|safe }}</li>
+
+    <li><span style="color:#8a5030 ;"><strong>About : </strong> </span>{{ project_details.project_details|safe }}</li>
+    <li><span style="color:#8a5030 ;"><strong>Software Required : </strong> </span>{{ project_details.software_required|safe }}</li>
+    <li><span style="color:#8a5030 ;"><strong>lab : </strong> </span>{{ project_details.lab|safe }}</li>
+    <li><span style="color:#8a5030 ;"><strong>taken : </strong> </span>{{ project_details.taken|safe }}</li>
+    <li><span style="color:#8a5030 ;"><strong>Can be taken by : </strong> </span>{{ project_details.can_be_taken_by|safe }}</li>
+    <li><span style="color:#8a5030 ;"><strong>Available : </strong> </span>{{ project_details.available|safe }}</li>
 
   </ul>
   <br><br>

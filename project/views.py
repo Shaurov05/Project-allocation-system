@@ -15,6 +15,7 @@ from django.views.generic import (TemplateView,ListView,View,
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from braces.views import SelectRelatedMixin
+import xlrd
 
 from django.forms import ModelForm
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
@@ -22,7 +23,7 @@ from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineForm
 from .forms import *
 from .models import *
 from department.models import Department
-
+from department.views import SuperUserCheck
 from django.db import transaction
 
 
@@ -38,7 +39,7 @@ def CreateNewProject(request):
         if request.user.is_superuser or request.user.teacher:
             if request.method == 'GET':
                 form = ProjectForm()
-                print("create - get method")
+                # print("create - get method")
 
                 return render(request, "project/project_form.html",
                               context={'form': form,
@@ -201,7 +202,7 @@ class AllProjects(ListView):
     template_name = 'project/project_list.html'
 
 
-class ProjectDeleteView(LoginRequiredMixin, DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, SuperUserCheck, DeleteView):
     login_url = '/user/login/'
     template_name = 'project/project_confirm_delete.html'
     model = Project
@@ -215,7 +216,127 @@ class ProjectDeleteView(LoginRequiredMixin, DeleteView):
           return reverse_lazy('projects:project_list')
 
 
+@login_required
+def upload_project_lists(request):
+    if request.method == 'GET':
+        return render(request, 'project/upload_project_lists.html', {})
+    elif request.method == 'POST':
+        try:
+            blFileData = request.FILES['projectLists']
+            countreturn = 0
 
+            if str(blFileData).lower().endswith(('.xl', '.xls', '.xlsx')):
+                xlrd.xlsx.ensure_elementtree_imported(False, None)
+                xlrd.xlsx.Element_has_iter = True
+                book = xlrd.open_workbook(file_contents=blFileData.read())
+
+                for sheet in book.sheets():
+                    number_of_rows = sheet.nrows
+
+                    try:
+                        for row in range(1, number_of_rows):
+                            # print(row)
+                            # print(sheet.cell(row, 2).value)
+                            # reading rows from the excel file
+                            name = str((sheet.cell(row, 0).value)).strip()
+                            project_details = str(sheet.cell(row, 1).value).strip()
+                            can_be_taken_by = int(sheet.cell(row, 2).value)
+                            software_required = str(sheet.cell(row, 3).value).strip()
+                            lab = str(sheet.cell(row, 4).value).strip()
+                            choosen_dept = str(sheet.cell(row, 5).value).split(',')
+
+                            choosen_dept = [dept.strip() for dept in choosen_dept]
+                            # print(return_transactionid)
+
+                            print("name: {}, detail: {}, taken_by: {}, "
+                                  "software: {}, lab: {}, dept:  {}".format(name, project_details,
+                                                                            can_be_taken_by, software_required, lab,
+                                                                            choosen_dept))
+                            # creating new object depending on the provided information
+                            project = Project.objects.create(name=name, project_details=project_details,
+                                                             can_be_taken_by=can_be_taken_by, software_required=software_required,
+                                                             lab=lab)
+                            countreturn += 1
+                            failed_attempts = 0
+
+                            # create new instance for DepartmentProject model, for each
+                            # department listed in chosen Divisions column of the excel file
+                            # as Department table has many-to-many relationship with Project table.
+                            for department_name in choosen_dept:
+                                try:
+                                    department = Department.objects.get(name=department_name)
+                                    print("name: ", department.name)
+                                    # create DepartmentProject object for every department in choosen_dept
+                                    DepartmentProject.objects.create(project=project,
+                                                                     department_id=department.id)
+                                except Exception as ex:
+                                    failed_attempts += 1
+                                    messages.error(request, str(ex))
+                                    print("department exception: ", ex)
+
+                            if failed_attempts == len(choosen_dept):
+                                # deleting the project
+                                # if any of the departments is not listed in the database,
+                                # then we delete the project.
+                                project.delete()
+                                countreturn -= 1
+
+                        messages.success(request, str(countreturn) + ' Projects Successfully enlisted in database')
+                        return redirect('projects:project_list')
+                    except Exception as ex:
+                        messages.error(request, str(ex))
+                        print("project exception: ", ex)
+                        return redirect('projects:upload_project_lists')
+        except Exception as ex:
+            print("1st exception: ", ex)
+            messages.error(request, str(ex))
+            return redirect('projects:upload_project_lists')
+
+
+@login_required
+def request_form(request):
+    if request.method == 'GET':
+        try:
+            instance = ProjectRequestProposal.objects.filter(created_by=request.user.student)
+            print("instance: ", instance)
+
+            if request.user.student and instance:
+                messages.error(request, "Cannot request more than once")
+                return redirect(reverse('students:student_detail',
+                                        kwargs={
+                                            'department_slug':request.user.student.department.department_slug,
+                                            'student_slug':request.user.student.student_slug}))
+        except Exception as ex:
+            print("request form exception: ", ex)
+
+        form = ProjectRequestProposalForm()
+        return render(request, 'project/request_form.html', context={'form': form})
+
+    elif request.method == 'POST':
+        # we get the information sent by the user using request.POST
+        project_request_form = ProjectRequestProposalForm(data=request.POST)
+
+        if project_request_form.is_valid():
+            # if the information sent by the user is valid, then we save info to the database.
+            instance = project_request_form.save(commit=False)
+            instance.created_by_id = request.user.student.id
+            instance.supervisor_id = request.user.student.supervisor.id
+            instance.save()
+
+        return redirect(reverse('students:student_detail',
+                                        kwargs={
+                                            'department_slug':request.user.student.department.department_slug,
+                                            'student_slug':request.user.student.student_slug}))
+
+
+def RequestedProjectList(request):
+    try:
+        requested_projects = ProjectRequestProposal.objects.filter(supervisor_id=request.user.teacher.id)
+    except :
+        requested_projects = ""
+
+    return render(request, 'project/requested_project_list.html',
+                  context={'requested_projects': requested_projects})
 
 
 

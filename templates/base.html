@@ -152,6 +152,8 @@
               </a>
               <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="{% url 'projects:create_project' %}">Create Project</a>
+                <a class="dropdown-item" href="{% url 'projects:upload_project_lists' %}">Upload Project lists</a>
+                <a class="dropdown-item" href="{% url 'projects:request_form' %}">Request to supervisor</a>
                 <a class="dropdown-item" href="{% url 'projects:project_list' %}">All Projects</a>
                 <a class="dropdown-item" href="{% url 'students:distributed_project_list' %}">Distributed Project List</a>
               </div>
@@ -201,6 +203,7 @@
                 <div class="dropdown-menu dropdown-content" aria-labelledby="navbarDropdownMenuLink">
 
                   <a class="dropdown-item" href="{% url 'teachers:teacher_detail' department_slug=user.teacher.department.department_slug teacher_slug=user.teacher.teacher_slug %}">Profile</a>
+                  <a class="dropdown-item" href="{% url 'projects:request_project_list' %}">Requested project list</a>
                   <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                 </div>
             </li>
