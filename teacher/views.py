@@ -141,12 +141,12 @@ def update_teacher_profile(request, teacher_slug):
             teacher_profile_form.updated_by = request.user
 
             user.save()
-            teacher_profile_form.save()
+            teacher = teacher_profile_form.save()
 
             # after saving information in database we send a success message
             messages.success(request, ('Your profile is successfully updated!'))
             return redirect(reverse('teachers:teacher_detail', kwargs={
-                                    'teacher_slug': teacher_slug,
+                                    'teacher_slug': teacher.teacher_slug,
                                     'department_slug': department_slug}))
         else:
             # if the forms are not valid we send an error message
@@ -191,7 +191,8 @@ class TeacherDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
 
           teacher = self.get_object()
           user = teacher.user
-          logout(self.request)
+          if user == self.request.user:
+              logout(self.request)
           user.delete()
           return reverse_lazy('departments:department_teachers', kwargs={
                                     'department_slug': dept_slug, })
