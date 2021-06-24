@@ -99,11 +99,12 @@ WSGI_APPLICATION = 'projectAllocation.wsgi.application'
 ## email sending app
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'expressyourthought05@gmail.com'
-EMAIL_HOST_PASSWORD = 'thisisbusinessemail'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+###### Email information
+EMAIL_HOST_USER = 'expressyourthought05@gmail.com'
+EMAIL_HOST_PASSWORD = 'iplgyacftqsbtbkc'
 
 
 # DATABASES = {
@@ -121,8 +122,8 @@ DATABASES = {
 		'NAME': 'project_allocation',
 		'USER': 'root',
 		'PASSWORD': "thisisdatabase",
-		'HOST':"",
-		'PORT': "",
+		'HOST':"db",
+		'PORT': "3306",
 		'OPTIONS': {
 			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
 		}
@@ -169,10 +170,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(MAIN_DIR, 'media')
 
 STATIC_URL = '/static/'
+STATIC_DIR = os.path.join(MAIN_DIR, 'static')
+STATIC_ROOT = os.path.join(MAIN_DIR, 'staticfiles')
 # STATIC_ROOT = os.path.join(MAIN_DIR, 'static')
 
 STATICFILES_DIRS = [
-    os.path.join(MAIN_DIR, 'static')
+    STATIC_DIR
 ]
 
 LOGIN_URL = '/user/login/'
@@ -180,3 +183,4 @@ LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'thanks/'
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

@@ -20,7 +20,13 @@ parts/
 sdist/
 var/
 wheels/
-venv/
+
+
+migrations/
+**/migrations/**
+**/migrations/
+.idea
+
 pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
@@ -128,3 +134,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/db/

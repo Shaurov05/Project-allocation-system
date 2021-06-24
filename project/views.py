@@ -24,6 +24,7 @@ from .forms import *
 from .models import *
 from department.models import Department
 
+from department.views import SuperUserCheck
 from django.db import transaction
 
 
@@ -202,7 +203,7 @@ class AllProjects(ListView):
     template_name = 'project/project_list.html'
 
 
-class ProjectDeleteView(LoginRequiredMixin, DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, DeleteView, SuperUserCheck):
     login_url = '/user/login/'
     template_name = 'project/project_confirm_delete.html'
     model = Project

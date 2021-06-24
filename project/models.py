@@ -46,11 +46,6 @@ class Project(models.Model):
         return reverse("projects:project_detail",
                         kwargs={"project_slug":self.project_slug})
 
-    @receiver(pre_delete, sender=User)
-    def delete_user(sender, instance, **kwargs):
-        if not instance.is_superuser and not instance.teachers:
-            raise PermissionDenied
-
 
 class ProjectChoice(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="student_project_choices")

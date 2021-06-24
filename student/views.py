@@ -5,14 +5,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from PIL import Image
-from django.utils.text import slugify
-from django.contrib.auth.models import User
 
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
-
 from django.views.generic import (TemplateView,ListView,View,
                                   DetailView,CreateView,
                                   UpdateView,DeleteView)
@@ -21,6 +15,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from braces.views import SelectRelatedMixin
 from django.utils.text import slugify
+from project.models import *
 
 from .forms import StudentForm, StudentProfileInfoForm
 from .models import Student
@@ -92,7 +87,6 @@ def student_register(request):
                     'registered':registered})
 
 
-
 class StudentDetailView(SelectRelatedMixin, DetailView):
     select_related = ("user", "department")
     # declaring the name of the object (student_detail) using which we can get student data.
@@ -108,24 +102,25 @@ class StudentDetailView(SelectRelatedMixin, DetailView):
         )
 
 
-from project.models import *
 def student_detail_view(request, student_slug, department_slug):
+    assigned_project = ""
     # gets the particular student object, otherwise returns 404
     student_detail = get_object_or_404(
             Student,
             student_slug=student_slug
         )
 
-    assigned_project = student_detail.assigned_project_name
     try:
         # getting the project that is assigned to the particular student and
         # the project choices, selected by the student.
         project = Project.objects.get(name=student_detail.assigned_project_name)
         projectChoice = ProjectChoice.objects.filter(student_id=student_detail.id)
+        assigned_project = student_detail.assigned_project_name
     except:
         # if no project is assigned to the student, then assign null
         project = ""
         projectChoice = ""
+        assigned_project = ""
 
     try:
         requested_project = ProjectRequestProposal.objects.get(created_by=student_detail.id)
@@ -228,12 +223,12 @@ def update_student_profile(request, student_slug):
 
             # after manipulating the data we save the information to the database
             user.save()
-            student_profile_form.save()
+            student = student_profile_form.save()
 
             # we send a a success message
             messages.success(request, ('Your profile is successfully updated!'))
             return redirect(reverse('students:student_detail', kwargs={
-                                    'student_slug': student_slug,
+                                    'student_slug': student.student_slug,
                                     'department_slug': department_slug}))
         else:
             # if the forms are not valid, we send an error message and show the errors to the user
@@ -275,11 +270,12 @@ class StudentDeleteView(LoginRequiredMixin,SelectRelatedMixin, DeleteView):
         dept_slug = self.kwargs['department_slug']
         student = self.get_object()
         user = student.user
-        logout(self.request)
         user.delete()
-        # self.StudentLogoutView()
+
+        if user == self.request.user:
+            logout(self.request)
         return reverse('departments:department_students', kwargs={
-                                'department_slug': dept_slug,})
+                                'department_slug': dept_slug})
 
 
 class all_students(ListView):
